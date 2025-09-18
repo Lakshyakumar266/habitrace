@@ -8,20 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id           String    @id @default(uuid())
-  username     String    @unique @db.VarChar(90)
-  fullName     String    @db.VarChar(100)
-  email        String    @unique @db.VarChar(100)
-  passwordHash String
-  createdAt    DateTime  @default(now())
-
-  refreshTokens RefreshToken[]
-
-  @@map("users")
-}
-
-
 model RefreshToken {
   id        String   @id @default(uuid())
   token     String   @unique
@@ -29,6 +15,62 @@ model RefreshToken {
   revoked   Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  user   User @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
   userId String
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique @db.VarChar(90)
+  fullName     String   @db.VarChar(100)
+  email        String   @unique @db.VarChar(100)
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  refreshTokens  RefreshToken[]
+  participations Participation[]
+  racesCreated   Race[]          @relation("RaceCreatedBy")
+
+  @@map("users")
+}
+
+model Race {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  createdAt   DateTime @default(now())
+  createdById String
+
+  createdBy    User            @relation("RaceCreatedBy", fields: [createdById], references: [id])
+  participants Participation[]
+
+  @@map("races")
+}
+
+model Participation {
+  id       String   @id @default(uuid())
+  userId   String
+  raceId   String
+  joinedAt DateTime @default(now())
+
+  user     User      @relation(fields: [userId], references: [id])
+  race     Race      @relation(fields: [raceId], references: [id])
+  checkins Checkin[]
+
+  @@unique([userId, raceId]) // one user joins a race only once
+  @@map("participants")
+}
+
+model Checkin {
+  id              String   @id @default(uuid())
+  participationId String
+  checkinDate     DateTime // chosen by user for that race
+  createdAt       DateTime @default(now())
+
+  participation Participation @relation(fields: [participationId], references: [id])
+
+  @@unique([participationId, checkinDate]) // no duplicate check-ins for same day
+  @@map("checkins")
 }
