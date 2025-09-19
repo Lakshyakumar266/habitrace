@@ -11,21 +11,28 @@ const router = Router()
 
 router.route("/register").post(registerMiddleware, async (req, res) => {
 
-
-    const { username, fullName, fullname, email, password } = req.body;
+    const { username, fullName, fullname, email, password,pic } = req.body;
+console.log(pic);
 
     const passwordHash = await hash(password, 10);
     const result = await prisma.user.create({
         data: {
             username: username,
             fullName: fullName ?? fullname,
+            pic: pic,
             email: email,
             passwordHash: passwordHash,
         }
     });
 
-    const token = jwt.sign({ id: result.id?.toString(), name: result.username }, String(process.env.SECRET_KEY), {
-        expiresIn: '2 days',
+
+    const token = jwt.sign(
+        {
+            uuid: result.id?.toString(),
+            username: result.username
+        },
+        String(process.env.SECRET_KEY), {
+        expiresIn: '2d',
     });
 
 
@@ -53,12 +60,12 @@ router.route("/login").post(async (req, res) => {
     compare(password, checkUsername.passwordHash, (err: any, result: any) => {
         if (result) {
             // Passwords match, authentication successful
-
-            const token = jwt.sign({ id: result.id?.toString(), name: result.username }, String(process.env.SECRET_KEY), {
-                expiresIn: '2 days',
+            
+            const token = jwt.sign({ uuid: checkUsername.id?.toString(), username: checkUsername.username }, String(process.env.SECRET_KEY), {
+                expiresIn: '2d',
             });
             return res.send({
-                message: "logdin",
+                message: "logdin",  
                 success: true,
                 data: { token: token }
             })
@@ -77,7 +84,6 @@ router.route("/login").post(async (req, res) => {
 
 
 router.route("/logout").post((req, res) => {
-    console.log(req.headers.token);
     res.send({
         message: "user loggedout successfully",
         success: true,
@@ -89,7 +95,6 @@ router.route("/logout").post((req, res) => {
 
 //TODO: /api/auth/refresh – Refresh JWT/session
 router.route("/refresh").post((req, res) => {
-    console.log(req.headers.token);
     res.status(401).send({
         message: "",
         success: false,

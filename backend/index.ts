@@ -2,6 +2,8 @@
 // import { hash } from 'bcrypt';
 import express from 'express'
 import cors from 'cors'
+import authRouter from './routes/auth'
+import usersRouter from './routes/users'
 
 // const prisma = new PrismaClient();
 
@@ -12,9 +14,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 // routes
-import authRouter from './routes/auth'
-
 app.use('/api/v1/auth', authRouter)
+
+app.use('/api/v1/users', usersRouter)
+
 
 
 app.listen(process.env.PORT, () => {

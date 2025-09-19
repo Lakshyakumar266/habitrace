@@ -5,7 +5,8 @@ export const CreateUser = z.object({
     username: z.string(),
     email: z.email(),
     fullname: z.string(),
-    password: z.string()
+    password: z.string(),
+    pic: z.string(),
 })
 
 export interface UserSchema{

@@ -26,6 +26,7 @@ model User {
   email        String   @unique @db.VarChar(100)
   passwordHash String
   createdAt    DateTime @default(now())
+  pic          String
 
   refreshTokens  RefreshToken[]
   participations Participation[]
@@ -50,11 +51,10 @@ model Race {
 }
 
 model Participation {
-  id       String   @id @default(uuid())
+  id       String    @id @default(uuid())
   userId   String
   raceId   String
-  joinedAt DateTime @default(now())
-
+  joinedAt DateTime  @default(now())
   user     User      @relation(fields: [userId], references: [id])
   race     Race      @relation(fields: [raceId], references: [id])
   checkins Checkin[]
