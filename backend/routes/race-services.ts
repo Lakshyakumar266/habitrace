@@ -97,7 +97,52 @@ router.route("/:username/:raceSlug").get(authMiddleware, async (req, res) => {
 }) // Get race details
 
 
-router.route("/:id/join").get(authMiddleware, async (req, res) => { }) // Join a race
+router.route("/:username/:raceSlug/join").post(authMiddleware, async (req, res) => {
+    const raceSlug = req.params.raceSlug;
+    const raceCreator = req.params.username;
+    const userId = res.locals.uuid;
+
+    try {
+        const race = await prisma.race.findFirst({
+            where: {
+                raceSlug: raceSlug,
+                createdBy: {
+                    username: raceCreator
+                }
+            }
+        })
+        
+        if (!race) return res.status(404).send({
+            message: "Race dose'nt exist",
+            success: false,
+            data: {}
+        })
+        
+        const userParticipate = await prisma.participation.create({
+            data: {
+                userId: userId,
+                raceId: race.id
+            }
+        })
+
+        return res.status(201).send({
+            message: "Racer participated in race.",
+            success: true,
+            data: userParticipate
+        })
+
+    } catch (error) {
+        console.log(error);
+        
+        return res.status(404).send({
+            message: "Race dose'nt exist in Server",
+            success: false,
+            data: error
+        })
+    }
+
+
+}) // Join a race
 router.route("/:id/leave").get(authMiddleware, async (req, res) => { }) // Leave a race
 router.route("/:id/checkin").get(authMiddleware, async (req, res) => { }) // Race Daily check-in
 router.route("/:id/leaderboard").get(authMiddleware, async (req, res) => { }) // Get leaderboard for a race
