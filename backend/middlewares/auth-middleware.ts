@@ -14,7 +14,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         const decoded = jwt.verify(token, String(process.env.SECRET_KEY));
         (req as CustomRequest).token = decoded;
 
-        res.locals.user = decoded;        
+        res.locals.user = decoded;
 
         next()
 

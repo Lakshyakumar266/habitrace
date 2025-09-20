@@ -2,10 +2,9 @@ import { Router } from "express"
 import { authMiddleware } from "../middlewares/auth-middleware"
 import { PrismaClient } from '../generated/prisma'
 import type { UserSchema } from "../types"
+import prisma from "../utils/prisma.utility"
 
 const router = Router()
-
-const prisma = new PrismaClient()
 
 router.route("/:username").get(authMiddleware, async (req, res) => {
     const username = req.params.username;
@@ -38,7 +37,6 @@ router.route("/:username/update").post(authMiddleware, async (req, res) => {
 
     const URLusername = req.params.username
     const UserUsername = res.locals.user.username;
-    const UserUuid = res.locals.user.uuid;
 
     if (URLusername === UserUsername) {
         const UpdateUser = await prisma.user.update({
@@ -67,6 +65,8 @@ router.route("/:username/update").post(authMiddleware, async (req, res) => {
     )
 })
 
+
+// TODO: Create Posts routes 
 router.route("/:username/posts").post(async (req, res) => {
     return
 })

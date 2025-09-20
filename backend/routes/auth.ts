@@ -3,8 +3,7 @@ import { registerMiddleware } from "../middlewares/Register-middleware";
 import { hash, compare } from "bcrypt";
 import { PrismaClient } from "../generated/prisma";
 import jwt from 'jsonwebtoken'
-
-const prisma = new PrismaClient();
+import prisma from "../utils/prisma.utility";
 
 
 const router = Router()
