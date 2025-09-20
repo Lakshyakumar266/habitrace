@@ -37,6 +37,7 @@ model User {
 
 model Race {
   id          String   @id @default(uuid())
+  raceSlug    String   @unique @db.VarChar(300)
   name        String
   description String?
   startDate   DateTime
@@ -54,6 +55,7 @@ model Participation {
   id       String    @id @default(uuid())
   userId   String
   raceId   String
+  joined   Boolean
   joinedAt DateTime  @default(now())
   user     User      @relation(fields: [userId], references: [id])
   race     Race      @relation(fields: [raceId], references: [id])

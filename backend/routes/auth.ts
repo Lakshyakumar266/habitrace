@@ -11,7 +11,6 @@ const router = Router()
 router.route("/register").post(registerMiddleware, async (req, res) => {
 
     const { username, fullName, fullname, email, password,pic } = req.body;
-console.log(pic);
 
     const passwordHash = await hash(password, 10);
     const result = await prisma.user.create({

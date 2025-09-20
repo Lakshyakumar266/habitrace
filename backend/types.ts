@@ -9,9 +9,16 @@ export const CreateUser = z.object({
     pic: z.string(),
 })
 
-export interface UserSchema{
-    uuid:string,
-    username:string,
-    email:string,
-    fullname:string,
+export interface UserSchema {
+    uuid: string,
+    username: string,
+    email: string,
+    fullname: string,
 }
+
+export const CreateRace = z.object({
+    name: z.string(),
+    description: z.string(),
+    startDate: z.coerce.date(),
+    endDate: z.coerce.date()
+})
