@@ -29,10 +29,16 @@ model User {
   pic          String
 
   refreshTokens  RefreshToken[]
-  participations Participation[]  @relation("joinedBy")
+  participations Participation[] @relation("joinedBy")
   racesCreated   Race[]          @relation("RaceCreatedBy")
 
   @@map("users")
+}
+
+enum Racefrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
 }
 
 model Race {
@@ -42,6 +48,7 @@ model Race {
   description String?
   startDate   DateTime
   endDate     DateTime
+  frequency   Racefrequency @default(DAILY)
   createdAt   DateTime @default(now())
   createdById String
 
@@ -55,10 +62,10 @@ model Participation {
   id       String    @id @default(uuid())
   userId   String
   raceId   String
-  joined   Boolean    @default(true)
+  joined   Boolean   @default(true)
   joinedAt DateTime  @default(now())
-  user     User      @relation("joinedBy",fields: [userId], references: [id])
-  race     Race      @relation("joinedRace",fields: [raceId], references: [id])
+  user     User      @relation("joinedBy", fields: [userId], references: [id])
+  race     Race      @relation("joinedRace", fields: [raceId], references: [id])
   checkins Checkin[]
 
   @@unique([userId, raceId]) // one user joins a race only once
