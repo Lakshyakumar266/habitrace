@@ -1,5 +1,5 @@
 
-class ApiResponse {
+export default class ApiResponse {
     statusCode: number
     data: any
     message: string
@@ -11,3 +11,4 @@ class ApiResponse {
             this.success = statusCode < 400
     }
 }
+

@@ -3,6 +3,7 @@ import { authMiddleware } from "../middlewares/auth-middleware";
 import prisma from "../utils/prisma.utility";
 import { createRaceMiddleware } from "../middlewares/race-middleware";
 import { checkRaceValidity } from "../middlewares/raceCheckin-middleware";
+import ApiResponse from "../utils/apiResponse";
 
 const router = Router()
 
@@ -159,7 +160,7 @@ router.route("/:raceSlug/leave").post(authMiddleware, async (req, res) => {
         const quitParticipation = await prisma.participation.update({
             where: { id: checkRaceParticipation.id, raceId: checkRaceParticipation.raceId, userId: userId },
             data: {
-                joined:false
+                joined: false
             }
         })
 
@@ -182,16 +183,70 @@ router.route("/:raceSlug/leave").post(authMiddleware, async (req, res) => {
 
 
 
-router.route("/:raceSlug/checkin").post(authMiddleware,checkRaceValidity, async (req, res) => {
-    
+router.route("/:raceSlug/checkin").post(authMiddleware, checkRaceValidity, async (req, res) => {
+
+    try {
+        const checkinList = res.locals.checkinList.data;
+        const endDate = res.locals.checkinList.raceEndDate;
+        const participant = res.locals.checkinList.participant;
+        const today = new Date();
+
+        const startOfDay = new Date(today);
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const endOfDay = new Date(today);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const participantCheckins = await prisma.checkin.findFirst({
+            where: {
+                AND: {
+                    participationId: participant.id,
+                    checkinDate: {
+                        gte: startOfDay,
+                        lte: endOfDay
+                    }
+                }
+            }
+        });
+
+
+        if (today.getDate() === endDate.getDate()) {
+            return res.status(202).send({
+                message: "HabitRace has alredy ended.",
+                success: false,
+                data: {}
+            })
+        }
+
+        if (checkinList.find((item: { getDate: () => any; }) => { return item.getDate() == today.getDate() })) {
+            if (participantCheckins) return res.status(202).send({
+                message: "Alredy checkdin to race.",
+                success: false,
+                data: participantCheckins
+            })
+
+            const checkin = await prisma.checkin.create({ data: { participationId: participant.id, checkinDate: today } })
+            return res.status(200).send({
+                message: "checkdin to race succesfully.",
+                success: true,
+                data: checkin
+            })
+
+        }
+    } catch (error) {
+        return res.status(402).send({
+            message: "Unable checkin rightnow...",
+            success: true,
+            data: error
+        })
+    }
 }) // Race Daily check-in
 
 
 
-
-
-
-router.route("/:raceSlug/leaderboard").get(authMiddleware, async (req, res) => { }) // Get leaderboard for a race
+router.route("/:raceSlug/leaderboard").get(authMiddleware, async (req, res) => {
+    // TODO: Get leaderboard for race.
+}) // Get leaderboard for a race
 
 
 export default router;
