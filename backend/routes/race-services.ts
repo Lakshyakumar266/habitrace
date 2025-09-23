@@ -3,7 +3,7 @@ import { authMiddleware } from "../middlewares/auth-middleware";
 import prisma from "../utils/prisma.utility";
 import { createRaceMiddleware } from "../middlewares/race-middleware";
 import { checkRaceValidity } from "../middlewares/raceCheckin-middleware";
-import { groupLeaderboard } from "../utils/StreakActions";
+import { groupLeaderboard, persnalStreak } from "../utils/StreakActions";
 
 const router = Router()
 
@@ -181,8 +181,6 @@ router.route("/:raceSlug/leave").post(authMiddleware, async (req, res) => {
 
 
 
-
-
 router.route("/:raceSlug/checkin").post(authMiddleware, checkRaceValidity, async (req, res) => {
 
     try {
@@ -295,5 +293,48 @@ router.route("/:raceSlug/leaderboard").get(async (req, res) => {
 
 }) // Get leaderboard for a race
 
+router.route('/:raceSlug/streak').get(authMiddleware, async (req, res) => {
+    const raceSlug = req.params.raceSlug;
+    const userUuid = res.locals.user.uuid;
+    try {
+        const race = await prisma.race.findFirst({ where: { raceSlug: raceSlug } });
+        if (!race) {
+            return res.status(404).send({
+                message: "No Race Found",
+                success: false,
+                data: {}
+            })
+        }
+
+        const participant = await prisma.participation.findFirst({ where: { raceId: race.id, joined: true, userId: userUuid } });
+        if (!participant) {
+            return res.status(404).send({
+                message: "Race is Empty.",
+                success: false,
+                data: {}
+            })
+        }
+
+        const checkins = await prisma.checkin.findMany({ where: { participation: { raceId: race.id, userId: userUuid } } });
+
+        // console.log(participant);
+
+        const leaderboard = await persnalStreak(participant, checkins);
+
+        return res.status(200).send({
+            message: "found race",
+            success: true,
+            data: leaderboard
+        })
+
+    } catch (error) {
+        return res.status(401).send({
+            message: "No Race Found",
+            success: false,
+            data: error
+        })
+    }
+
+})
 
 export default router;
