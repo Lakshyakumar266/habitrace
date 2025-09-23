@@ -208,7 +208,7 @@ router.route("/:raceSlug/checkin").post(authMiddleware, checkRaceValidity, async
         });
 
 
-        if (today.getDate() === endDate.getDate()) {
+        if (today.getDate() > endDate.getDate()) {
             return res.status(202).send({
                 message: "HabitRace has alredy ended.",
                 success: false,
@@ -217,13 +217,28 @@ router.route("/:raceSlug/checkin").post(authMiddleware, checkRaceValidity, async
         }
 
         if (checkinList.find((item: { getDate: () => any; }) => { return item.getDate() == today.getDate() })) {
+
             if (participantCheckins) return res.status(202).send({
                 message: "Alredy checkdin to race.",
                 success: false,
                 data: participantCheckins
             })
 
-            const checkin = await prisma.checkin.create({ data: { participationId: participant.id, checkinDate: today } })
+            const checkin = await prisma.checkin.create({ data: { participationId: participant.id, checkinDate: today } });
+            (checkin as any).complition = false;
+            
+            if (today.getDate() === endDate.getDate()) {
+
+                //TODO: Give achivement to user as its the last day of race. 
+
+                (checkin as any).complition = true;
+                return res.status(200).send({
+                    message: "congrats you have successfully completed the race.",
+                    success: true,
+                    data: checkin
+                })
+            }
+            
             return res.status(200).send({
                 message: "checkdin to race succesfully.",
                 success: true,
