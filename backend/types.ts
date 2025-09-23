@@ -22,3 +22,9 @@ export const CreateRace = z.object({
     startDate: z.coerce.date(),
     endDate: z.coerce.date()
 })
+
+export interface Leaderboard {
+    username:string,
+    streak:number,
+}
+

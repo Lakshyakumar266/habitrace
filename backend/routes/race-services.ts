@@ -3,7 +3,7 @@ import { authMiddleware } from "../middlewares/auth-middleware";
 import prisma from "../utils/prisma.utility";
 import { createRaceMiddleware } from "../middlewares/race-middleware";
 import { checkRaceValidity } from "../middlewares/raceCheckin-middleware";
-import ApiResponse from "../utils/apiResponse";
+import { groupLeaderboard } from "../utils/StreakActions";
 
 const router = Router()
 
@@ -67,7 +67,7 @@ router.route("/").get(async (req, res) => {
 
 
 
-router.route("/:raceSlug").get(authMiddleware, async (req, res) => {
+router.route("/:raceSlug").get(async (req, res) => {
     const raceSlug = req.params.raceSlug;
     try {
 
@@ -244,8 +244,55 @@ router.route("/:raceSlug/checkin").post(authMiddleware, checkRaceValidity, async
 
 
 
-router.route("/:raceSlug/leaderboard").get(authMiddleware, async (req, res) => {
-    // TODO: Get leaderboard for race.
+router.route("/:raceSlug/leaderboard").get(async (req, res) => {
+
+    const raceSlug = req.params.raceSlug;
+    try {
+
+        const race = await prisma.race.findFirst({ where: { raceSlug: raceSlug } });
+        if (!race) {
+            return res.status(404).send({
+                message: "No Race Found",
+                success: false,
+                data: {}
+            })
+        }
+
+        const participants = await prisma.participation.findMany({ where: { raceId: race.id, joined: true } });
+        if (!participants) {
+            return res.status(404).send({
+                message: "Race is Empty.",
+                success: false,
+                data: {}
+            })
+        }
+
+        const checkins = await prisma.checkin.findMany({ where: { participation: { raceId: race.id } } });
+
+        const leaderboard = await groupLeaderboard(participants, checkins);
+
+        const leaderboardArry = await Promise.all(leaderboard.map(async item => {
+            const value = await Promise.resolve(item);
+            return value;
+        }));
+
+        console.log(leaderboardArry);
+
+
+
+        return res.status(200).send({
+            message: "found race",
+            success: true,
+            data: leaderboardArry
+        })
+    } catch (error) {
+        return res.status(401).send({
+            message: "No Race Found",
+            success: false,
+            data: error
+        })
+    }
+
 }) // Get leaderboard for a race
 
 
