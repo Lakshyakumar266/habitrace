@@ -6,7 +6,7 @@ export const createRaceMiddleware = async (req: Request, res: Response, next: Ne
     try {
         const { success, data } = CreateRace.safeParse(req.body)
         
-        if (!success) return res.status(403).send({
+        if (!success) return res.status(401).send({
             message: "faild to create race",
             success: false,
             error: "invalid credentials",
@@ -14,7 +14,7 @@ export const createRaceMiddleware = async (req: Request, res: Response, next: Ne
         });
         next()
     } catch (error) {
-        return res.status(403).send({
+        return res.status(401).send({
             message: "faild to create race",
             success: false,
             error: "server error",

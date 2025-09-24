@@ -12,13 +12,15 @@ const router = Router()
 router.route("/register").post(registerMiddleware, async (req, res) => {
 
     const { username, fullName, fullname, email, password, pic } = req.body;
-
+    
     const passwordHash = await hash(password, 10);
+    console.log(req.body);
+    
     const result = await prisma.user.create({
         data: {
             username: username,
             fullName: fullName ?? fullname,
-            pic: pic,
+            pic: (pic? pic : "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"),
             email: email,
             passwordHash: passwordHash,
         }
@@ -82,20 +84,28 @@ router.route("/login").post(async (req, res) => {
 
 
 
-router.route("/checkusername").post(async (req, res) => {
+router.route("/checkusername").get(async (req, res) => {
     const { username, email } = req.body
     try {
         const checkUsername = await prisma.user.findFirst({ where: { OR: [{ username }, { email }] } })
-        if (checkUsername?.username === username || checkUsername?.email === email) {
+        if (checkUsername?.username === username) {
             return res.status(200).send({
-                message: "username or email alredy exist",
+                message: "username alredy exist",
                 success: false,
-                error: "username alredy taken"
+                data: { username: false, email: true }
+            });
+        }
+
+        if (checkUsername?.email === email) {
+            return res.status(200).send({
+                message: "email alredy exist",
+                success: false,
+                error: { username: true, email: false }
             });
         }
 
         return res.status(200).send({
-            message: "username available",
+            message: "username & email available",
             success: true,
             data: {}
         });

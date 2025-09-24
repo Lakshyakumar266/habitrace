@@ -12,16 +12,16 @@ export const registerMiddleware = async (req: Request, res: Response, next: Next
         
 
         if (checkUsername?.username === username) {   
-            return res.status(403).send({
+            return res.status(401).send({
                 message: "user alredy exist",
                 success: false,
                 error: "username alredy taken"
             });
         }
-
+        
         // zod checking
         const { success, data } = CreateUser.safeParse(req.body)
-        if (!success) return res.status(403).send({
+        if (!success) return res.status(401).send({
             message: "Authentication invalid",
             success: false,
             error: "invalid fields"
@@ -29,7 +29,7 @@ export const registerMiddleware = async (req: Request, res: Response, next: Next
         next()
         
     } catch (error) {
-        return res.status(403).send({
+        return res.status(401).send({
             message: "Server Error",
             success: false,
             error: error

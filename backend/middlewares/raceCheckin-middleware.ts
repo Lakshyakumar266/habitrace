@@ -22,7 +22,7 @@ export const checkRaceValidity = async (req: Request, res: Response, next: NextF
         const userId = res.locals.user.uuid;
         const getRace = await prisma.race.findFirst({ where: { raceSlug: raceSlug } })
 
-        if (!getRace) return res.status(403).send({
+        if (!getRace) return res.status(401).send({
             message: "faild to find race",
             success: false,
             error: "invalid credentials",
@@ -32,7 +32,7 @@ export const checkRaceValidity = async (req: Request, res: Response, next: NextF
         const getParticipant = await prisma.participation.findFirst({ where: { raceId: getRace.id, userId: userId } })
 
         
-        if (!getParticipant || !getParticipant.joined) return res.status(403).send({
+        if (!getParticipant || !getParticipant.joined) return res.status(401).send({
             message: "You are not participating in this race.",
             success: false,
             error: "invalid credentials",
@@ -79,7 +79,7 @@ export const checkRaceValidity = async (req: Request, res: Response, next: NextF
             next()
         }
 
-        else return res.send(403).send({
+        else return res.send(401).send({
             message: "faild to get race details",
             success: false,
             error: "server error",
@@ -87,7 +87,7 @@ export const checkRaceValidity = async (req: Request, res: Response, next: NextF
         })
 
     } catch (error) {
-        return res.status(403).send({
+        return res.status(401).send({
             message: "faild to checkin in race",
             success: false,
             error: "server error",

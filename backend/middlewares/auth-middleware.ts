@@ -19,7 +19,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         next()
 
     } catch (error) {
-        return res.status(403).send({
+        return res.status(401).send({
             message: "Please authenticate'",
             success: false,
             error: error
