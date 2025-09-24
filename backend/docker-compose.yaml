@@ -2,7 +2,7 @@ services:
   db:
     image: postgres:alpine
     container_name: postgres
-    restart: no
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -17,3 +17,31 @@ services:
     volumes:
       - ./docker/data/db:/var/lib/postgresql/data
     attach: false
+    networks:
+      - app-network
+
+  # backend:
+  #   image: lakshyakumar266/habbitrace-backend:1.0.0.0
+  #   container_name: backend
+  #   restart: unless-stopped
+  #   environment:
+  #     DB_HOST: db  # Use service name as host
+  #     DB_PORT: 5432
+  #     DB_NAME: ${DB_NAME}
+  #     DB_USER: ${DB_USER}
+  #     DB_PASSWORD: ${DB_PASSWORD}
+  #     DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+  #   ports:
+  #     - 3001:3001  # make sure you don't have another container running on DB_PORT
+  #   attach: false
+
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks:
+  #     - app-network
+
+
+networks:
+  app-network:
+    driver: bridge

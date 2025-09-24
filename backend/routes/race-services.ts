@@ -3,7 +3,7 @@ import { authMiddleware } from "../middlewares/auth-middleware";
 import prisma from "../utils/prisma.utility";
 import { createRaceMiddleware } from "../middlewares/race-middleware";
 import { checkRaceValidity } from "../middlewares/raceCheckin-middleware";
-import { groupLeaderboard, persnalStreak } from "../utils/StreakActions";
+import { groupLeaderboard, persnalStreak } from "../utils/streakActions";
 
 const router = Router()
 

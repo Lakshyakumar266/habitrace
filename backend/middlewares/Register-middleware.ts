@@ -11,7 +11,7 @@ export const registerMiddleware = async (req: Request, res: Response, next: Next
         const checkUsername = await prisma.user.findFirst({ where: { OR: [{ username }, { email }] } })
         
 
-        if (checkUsername === username) {   
+        if (checkUsername?.username === username) {   
             return res.status(403).send({
                 message: "user alredy exist",
                 success: false,

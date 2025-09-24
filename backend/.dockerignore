@@ -1,0 +1,6 @@
+**/node_modules/
+**/dist
+.git
+/docker
+/generated
+/docker-compose.yaml

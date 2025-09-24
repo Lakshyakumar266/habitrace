@@ -4,7 +4,7 @@ import prisma from "../utils/prisma.utility"
 
 const router = Router()
 
-router.route("/:username").get(authMiddleware, async (req, res) => {
+router.route("/:username").get(async (req, res) => {
     const username = req.params.username;
 
     const getUser = await prisma.user.findFirst({ where: { username } })

@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "bun --watch run index.ts",
     "start": "bun index.ts",
-    "db:postgress": "docker-compose up -d",
+    "postgress": "docker-compose up -d",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio"
