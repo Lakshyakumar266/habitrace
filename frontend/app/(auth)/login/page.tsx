@@ -1,5 +1,4 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,80 +7,176 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FormLabel } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@radix-ui/react-label";
-import { Link } from "lucide-react";
-import { Form } from "react-hook-form";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {loginformSchema} from "@/schemas/fromSchema";
+import axios from "axios";
+import { toast } from "sonner";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const router = useRouter();
+
   const formType = "login";
+  type FormData = z.infer<typeof loginformSchema>;
+
+  // ✅ useForm must be called BEFORE any other logic
+  const form = useForm<FormData>({
+    resolver: zodResolver(loginformSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
+
+  // ✅ Now registerHandler can be defined after useForm
+  const loginHandler = async (data: FormData) => {
+    console.log("HIIIIIIIIIIII");
+    
+    try {
+      console.log("Form submitted:", data);
+
+      const response = await axios.post(
+        "http://localhost:3001/api/v1/auth/login",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("login successful:", response.data);
+      toast.success("login successful!");
+
+      // Handle success (redirect, show message, etc.)
+      if (response.status === 200) {
+        console.log("User logdin successfully!");
+        Cookies.set("token", response.data.data.token, {
+          expires: 7, // 7 days
+          path: "/",
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        });
+
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+
+      if (axios.isAxiosError(error)) {
+        // Axios error with response from server
+        if (error.response?.status === 401) {
+          toast.error("Check the credentials you provided!");
+        }
+      }
+    }
+  };
+
+  const googleLoginHandler = () => {};
+
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <div className="flex flex-col gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                {formType.charAt(0).toUpperCase() + formType.slice(1)} to your
-                account
-              </CardTitle>
-              <CardDescription>
-                Enter your email below to {formType} to your account
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form >
-                <div className="flex flex-col gap-6">
-                  <div className="grid gap-3">
-                    <FormLabel htmlFor="email">Email</FormLabel>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="m@example.com"
-                      required
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <div className="flex items-center">
-                      <Label htmlFor="password">Password</Label>
-                      <Link
-                        href="/forgetpassword"
-                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                      >
-                        Forgot your password?
-                      </Link>
-                    </div>
-                    <Input id="password" type="password" required />
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    <Button type="submit" className="w-full">
-                      Login
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onSubmit={() => {}}
-                    >
-                      Login with Google
-                    </Button>
-                  </div>
+      <div className="w-full max-w-md">
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {formType.charAt(0).toUpperCase() + formType.slice(1)} to your
+              account
+            </CardTitle>
+            <CardDescription>
+              Enter your username below to {formType} to your account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(loginHandler)}
+                className="space-y-4"
+              >
+              
+                <FormField
+                  control={form.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Username</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="anasthesia@example.com"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center">
+                        <FormLabel>Password</FormLabel>
+                        <Link
+                          href="/forgetpassword"
+                          className="ml-auto text-sm underline-offset-4 hover:underline"
+                        >
+                          Forgot your password?
+                        </Link>
+                      </div>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          {...field}
+                          placeholder="********"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex flex-col gap-3">
+                  <Button type="submit" className="w-full">
+                    Login
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={googleLoginHandler}
+                  >
+                    Login with Google
+                  </Button>
                 </div>
-                <div className="mt-4 text-center text-sm">
-                  <>
-                    Alredy have an account?{" "}
-                    <Link
-                      href="/login"
-                      className="underline underline-offset-4"
-                    >
-                      Login
-                    </Link>
-                  </>
-                </div>
-              </Form>
-            </CardContent>
-          </Card>
-        </div>
+              </form>
+            </Form>
+
+            <div className="mt-4 text-center text-sm">
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/register"
+                className="underline underline-offset-4"
+              >
+                Register here
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

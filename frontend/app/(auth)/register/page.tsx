@@ -20,7 +20,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import formSchema from "@/schemas/fromSchema";
+import {signupformSchema as formSchema} from "@/schemas/fromSchema";
 import axios from "axios";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
