@@ -23,6 +23,7 @@ import { z } from "zod";
 import formSchema from "@/schemas/fromSchema";
 import axios from "axios";
 import { toast } from "sonner";
+import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
 export default function Page() {
@@ -63,7 +64,13 @@ export default function Page() {
       // Handle success (redirect, show message, etc.)
       if (response.status === 200) {
         console.log("User registered successfully!");
-        localStorage.setItem("token", response.data.data.token);
+        Cookies.set("token", response.data.data.token, {
+          expires: 7, // 7 days
+          path: "/",
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        });
+
         router.push("/");
       }
     } catch (error) {
