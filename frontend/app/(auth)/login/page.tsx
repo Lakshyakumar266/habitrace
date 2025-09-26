@@ -115,7 +115,7 @@ export default function Page() {
                       <FormLabel>Username</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="anasthesia@example.com"
+                          placeholder="anasthesia_01"
                           {...field}
                         />
                       </FormControl>
@@ -154,14 +154,14 @@ export default function Page() {
                   <Button type="submit" className="w-full">
                     Login
                   </Button>
-                  <Button
+                  {/* <Button
                     type="button"
                     variant="outline"
                     className="w-full"
                     onClick={googleLoginHandler}
                   >
                     Login with Google
-                  </Button>
+                  </Button> */}
                 </div>
               </form>
             </Form>
