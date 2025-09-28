@@ -12,7 +12,9 @@ type Card = {
   startDate: string;
   endDate: string;
   frequency: string;
-  createdBy: string;
+  createdBy: {
+    username: string;
+  };
 };
 
 export default function Page() {
@@ -47,7 +49,7 @@ export default function Page() {
                 eDate={card.endDate}
                 link={card.raceSlug}
                 frequency={card.frequency}
-                createdBy={card.createdBy}
+                createdBy={card.createdBy.username}
               />
             ))}
           </div>
