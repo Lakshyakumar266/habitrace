@@ -4,12 +4,10 @@ import { useState } from "react";
 
 import {
   BadgeCheckIcon,
-  EllipsisIcon,
   HeartIcon,
-  MessageCircleIcon,
-  RepeatIcon,
-  SendIcon,
-  UserPlusIcon,
+  Globe,
+  Share2,
+  CirclePlus,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -23,14 +21,41 @@ import {
 } from "@/components/ui/card";
 
 import { cn } from "@/lib/utils";
-import Image from "next/image";
+import Link from "next/link";
 
 interface RaceCardHubProps {
   className?: string;
-  // ... other props
+  title?: string;
+  description?: string;
+  sDate?: string;
+  eDate?: string;
+  link?: string;
+  frequency?: string;
+  createdBy?: string;
 }
 
-const RaceCardHub: React.FC<RaceCardHubProps> = ({ className, ...props }) => {
+const convertDate = (dateString: string | undefined) => {
+  if (dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "2-digit",
+    });
+  }
+  return "";
+};
+
+const RaceCardHub: React.FC<RaceCardHubProps> = ({
+  className,
+  title,
+  description,
+  sDate,
+  eDate,
+  link,
+  frequency,
+  createdBy,
+}) => {
   const [liked, setLiked] = useState<boolean>(true);
 
   return (
@@ -39,45 +64,48 @@ const RaceCardHub: React.FC<RaceCardHubProps> = ({ className, ...props }) => {
         <div className="flex items-center gap-3">
           <div className="flex flex-col gap-0.5">
             <CardTitle className="flex items-center gap-1 text-sm">
-              Philip George{" "}
+              {String(title).toUpperCase()}{" "}
               <BadgeCheckIcon className="size-4 fill-sky-600 stroke-white dark:fill-sky-400" />
             </CardTitle>
-            <CardDescription>@philip20</CardDescription>
+            <span className="text-xs text-muted-foreground/70">
+              {convertDate(sDate)} - {convertDate(eDate)}
+            </span>{" "}
+            <CardDescription>
+              @{createdBy?.replaceAll(" ", "_")}
+            </CardDescription>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <UserPlusIcon />
-            Follow
-          </Button>
-          <Button variant="ghost" size="icon" aria-label="Toggle menu">
-            <EllipsisIcon className="size-4" />
-          </Button>
-        </div>
+        <Link href={`/race/${link}`}>
+        <Button variant="outline" size="sm">
+          <CirclePlus className="size-4" />
+          Race
+        </Button>
+        </Link>
       </CardHeader>
       <CardContent className="space-y-6 text-sm">
-        <img
-          src="https://cdn.shadcnstudio.com/ss-assets/components/card/image-6.png?width=350&format=auto"
-          alt="Banner"
-          className="aspect-video w-full rounded-md object-cover"
-          width={350}
-          height={196}
-        />
         <p>
-          Lost in the colors of the night 🌌✨ Sometimes the blur reveals more
-          than clarity.{" "}
-          <a href="#" className="text-sky-600 dark:text-sky-400">
-            #AbstractVibes
-          </a>{" "}
-          <a href="#" className="text-sky-600 dark:text-sky-400">
-            #Dreamscape
-          </a>{" "}
-          <a href="#" className="text-sky-600 dark:text-sky-400">
-            #VisualPoetry
-          </a>
+          {description ? (
+            description
+          ) : (
+            <>
+              its an race.{" "}
+              <a href="#" className="text-sky-600 dark:text-sky-400">
+                #race
+              </a>{" "}
+              <a href="#" className="text-sky-600 dark:text-sky-400">
+                #{link}
+              </a>{" "}
+              <a href="#" className="text-sky-600 dark:text-sky-400">
+                #{frequency}
+              </a>{" "}
+              <a href="#" className="text-sky-600 dark:text-sky-400">
+                #{title}
+              </a>
+            </>
+          )}
         </p>
       </CardContent>
-      <CardFooter className="flex items-center gap-1">
+      <CardFooter className="flex justify-end items-center gap-1">
         <Button variant="ghost" size="sm" onClick={() => setLiked(!liked)}>
           <HeartIcon
             className={cn(
@@ -85,19 +113,14 @@ const RaceCardHub: React.FC<RaceCardHubProps> = ({ className, ...props }) => {
               liked && "fill-destructive stroke-destructive"
             )}
           />
-          2.1K
         </Button>
+
         <Button variant="ghost" size="sm">
-          <MessageCircleIcon className="size-4" />
-          1.4K
-        </Button>
-        <Button variant="ghost" size="sm">
-          <RepeatIcon className="size-4" />
-          669
-        </Button>
-        <Button variant="ghost" size="sm">
-          <SendIcon className="size-4" />
+          <Globe className="size-4" />
           1.1K
+        </Button>
+        <Button variant="ghost" size="sm">
+          <Share2 className="size-4" />
         </Button>
       </CardFooter>
     </Card>

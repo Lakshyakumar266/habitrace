@@ -1,24 +1,28 @@
 "use client";
 
 import RaceCardHub from "@/components/shadcn-studio/card/card-11";
+import axios from "axios";
 import { useEffect, useState } from "react";
 
 type Card = {
   id: number;
-  title: string;
+  name: string;
   description: string;
-  link: string;
+  raceSlug: string;
+  startDate: string;
+  endDate: string;
+  frequency: string;
+  createdBy: string;
 };
+
 export default function Page() {
   const [cards, setCards] = useState<Card[]>([]);
   useEffect(() => {
-    setCards([
-      { id: 1, title: "Card 1", description: "Description 1", link: "/" },
-      { id: 2, title: "Card 2", description: "Description 2", link: "/" },
-      { id: 3, title: "Card 2", description: "Description 2", link: "/" },
-      { id: 4, title: "Card 2", description: "Description 2", link: "/" },
-      { id: 5, title: "Card 2", description: "Description 2", link: "/" },
-    ]);
+    axios.get("http://localhost:3001/api/v1/race/").then((response) => {
+      console.log(response.data.data);
+
+      setCards(response.data.data);
+    });
   }, []);
 
   return (
@@ -34,7 +38,17 @@ export default function Page() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 md:grid-cols-2  gap-4 justify-items-center">
             {cards.map((card) => (
-              <RaceCardHub key={card.id} className="w-80" />
+              <RaceCardHub
+                key={card.id}
+                className="w-80"
+                title={card.name}
+                description={card.description}
+                sDate={card.startDate}
+                eDate={card.endDate}
+                link={card.raceSlug}
+                frequency={card.frequency}
+                createdBy={card.createdBy}
+              />
             ))}
           </div>
         )}
