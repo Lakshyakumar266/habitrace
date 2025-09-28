@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 // 1. Specify protected and public routes
 const protectedRoutes = ['/']
-const publicRoutes = ['/login', '/signup']
+const publicRoutes = ['/login', '/register', '/forgotpassword']
 
 export default async function middleware(req: NextRequest) {
     // 2. Check if the current route is protected or public
@@ -24,14 +24,12 @@ export default async function middleware(req: NextRequest) {
             // console.log("PROTECTED ROUTE");
             return NextResponse.redirect(new URL('/login', req.nextUrl))
     }
+console.log(req.nextUrl.pathname);
 
     // 5. Redirect to /dashboard if the user is authenticated
     if (
-        isPublicRoute &&
-        // session?.userId &&
-        !req.nextUrl.pathname.startsWith('/')
-    ) {
-        return NextResponse.redirect(new URL('/', req.nextUrl))
+        isPublicRoute && cookie) {
+        return NextResponse.redirect(new URL('/hub', req.nextUrl))
     }
 
     return NextResponse.next()
