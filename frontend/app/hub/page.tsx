@@ -42,7 +42,7 @@ export default function Page() {
             {cards.map((card) => (
               <RaceCardHub
                 key={card.id}
-                className="w-80"
+                className="w-100"
                 title={card.name}
                 description={card.description}
                 sDate={card.startDate}

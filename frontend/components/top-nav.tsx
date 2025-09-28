@@ -51,7 +51,7 @@ export default function TopNav() {
     >
       <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-4">
         <div className="flex items-center gap-3">
-          <Link href="/" className="font-semibold tracking-tight">
+          <Link href="/hub" className="font-semibold tracking-tight">
             <span className="text-pretty">HabitRace</span>
             <span className="sr-only">Go to homepage</span>
           </Link>
@@ -115,7 +115,7 @@ export default function TopNav() {
                     src="/diverse-avatars.png"
                     alt="Your profile picture"
                   />
-                  <AvatarFallback>AB</AvatarFallback>
+                  <AvatarFallback>{"LK"}</AvatarFallback>
                 </Avatar>
               </button>
             </DropdownMenuTrigger>
