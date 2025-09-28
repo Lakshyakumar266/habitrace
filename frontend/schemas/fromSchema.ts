@@ -1,6 +1,6 @@
 import z from "zod";
 
-const signupformSchema = z.object({
+const formSchema = z.object({
     fullname: z.string().min(3, "use real valid name"),
     username: z.string().min(3, "it must be a valid username"),
     email: z.string().email(),
