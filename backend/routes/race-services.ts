@@ -8,8 +8,8 @@ import { groupLeaderboard, persnalStreak } from "../utils/streakActions";
 const router = Router()
 
 router.route("/").post(authMiddleware, createRaceMiddleware, async (req, res) => {
-    const { name: raceName, description: raceDescription, startDate: raceStartingDate, endDate: raceEndingDate } = req.body;
-    const raceSlug = String(raceName + '_racer').replace(' ', '_')
+    const { name: raceName, description: raceDescription, startDate: raceStartingDate, endDate: raceEndingDate, frequency: raceFrequency } = req.body;
+    const raceSlug = String(raceName + `_race`).replaceAll(' ', '_')
 
     try {
         const createRace = await prisma.race.create({
@@ -19,6 +19,7 @@ router.route("/").post(authMiddleware, createRaceMiddleware, async (req, res) =>
                 description: raceDescription,
                 startDate: raceStartingDate,
                 endDate: raceEndingDate,
+                frequency: raceFrequency,
                 createdById: res.locals.user.uuid
             }
         })
@@ -44,6 +45,22 @@ router.route("/").get(async (req, res) => {
     try {
 
         const races = await prisma.race.findMany({
+            select: {
+                id: true,
+                raceSlug: true,
+                name: true,
+                description: true,
+                startDate: true,
+                endDate: true,
+                frequency: true,
+                createdById: true,
+                createdAt: true,
+                createdBy: {
+                    select: {
+                        username: true
+                    }
+                }
+            },
             orderBy: {
                 createdAt: 'desc'
             }
@@ -57,7 +74,7 @@ router.route("/").get(async (req, res) => {
 
 
     } catch (error) {
-        return res.status(401).send({
+        return res.status(404).send({
             message: "Database Server Error",
             success: false,
             data: error
@@ -78,14 +95,17 @@ router.route("/:raceSlug").get(async (req, res) => {
 
         })
 
-
+        console.log(race);
+        
+        if (!race) return res.status(404).send({message: "No Race Found",
+            success: false,data:null})
         return res.status(200).send({
             message: "found race",
             success: true,
             data: race
         })
     } catch (error) {
-        return res.status(401).send({
+        return res.status(404).send({
             message: "No Race Found",
             success: false,
             data: error
@@ -226,7 +246,7 @@ router.route("/:raceSlug/checkin").post(authMiddleware, checkRaceValidity, async
 
             const checkin = await prisma.checkin.create({ data: { participationId: participant.id, checkinDate: today } });
             (checkin as any).complition = false;
-            
+
             if (today.getDate() === endDate.getDate()) {
 
                 //TODO: Give achivement to user as its the last day of race. 
@@ -238,7 +258,7 @@ router.route("/:raceSlug/checkin").post(authMiddleware, checkRaceValidity, async
                     data: checkin
                 })
             }
-            
+
             return res.status(200).send({
                 message: "checkdin to race succesfully.",
                 success: true,
