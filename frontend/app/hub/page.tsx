@@ -1,44 +1,44 @@
+"use client";
 
+import RaceCardHub from "@/components/shadcn-studio/card/card-11";
+import { useEffect, useState } from "react";
 
+type Card = {
+  id: number;
+  title: string;
+  description: string;
+  link: string;
+};
 export default function Page() {
-    return (
-        <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-            <div className="w-full max-w-md">
-                <div className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-4">
-                        <h1 className="text-2xl font-bold">
-                            Welcome to Habit Race
-                        </h1>
-                        <p className="text-muted-foreground/70">
-                            A place to track your habits and progress
-                        </p>
-                        <div className="flex flex-col gap-2">
-                            <a
-                                href="/login"
-                                className="btn btn-primary"
-                            >
-                                Login
-                            </a>
-                            <a
-                                href="/register"
-                                className="btn btn-secondary"
-                            >
-                                Register
-                            </a>
-                            <a
-                                href="/forgotpassword"
-                                className="btn btn-outline"
-                            >
-                                Forgot Password
-                                </a>
-                        </div>
+  const [cards, setCards] = useState<Card[]>([]);
+  useEffect(() => {
+    setCards([
+      { id: 1, title: "Card 1", description: "Description 1", link: "/" },
+      { id: 2, title: "Card 2", description: "Description 2", link: "/" },
+      { id: 3, title: "Card 2", description: "Description 2", link: "/" },
+      { id: 4, title: "Card 2", description: "Description 2", link: "/" },
+      { id: 5, title: "Card 2", description: "Description 2", link: "/" },
+    ]);
+  }, []);
 
-                        
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    )
+  return (
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="">
+        {cards.length === 0 ? (
+          <div className="flex flex-col gap-4">
+            <h1 className="text-2xl font-bold">Welcome to Habit Race</h1>
+            <p className="text-muted-foreground/70">
+              A place to track your habits and progress
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 md:grid-cols-2  gap-4 justify-items-center">
+            {cards.map((card) => (
+              <RaceCardHub key={card.id} className="w-80" />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
-
