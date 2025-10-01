@@ -10,8 +10,7 @@ export default function Home() {
     // router.push("/hub");
   }, [router]);
   return (
-    <>
-      <Hero01 />
+    <Hero01 />
     </>
   );
 }
