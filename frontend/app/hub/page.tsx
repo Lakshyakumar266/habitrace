@@ -21,7 +21,6 @@ export default function Page() {
   const [cards, setCards] = useState<Card[]>([]);
   useEffect(() => {
     axios.get("http://localhost:3001/api/v1/race/").then((response) => {
-      console.log(response.data.data);
 
       setCards(response.data.data);
     });

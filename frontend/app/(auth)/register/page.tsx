@@ -46,7 +46,6 @@ export default function Page() {
   // ✅ Now registerHandler can be defined after useForm
   const registerHandler = async (data: FormData) => {
     try {
-      console.log("Form submitted:", data);
 
       const response = await axios.post(
         "http://localhost:3001/api/v1/auth/register",
@@ -58,12 +57,10 @@ export default function Page() {
         }
       );
 
-      console.log("Registration successful:", response.data);
       toast.success("Registration successful!");
 
       // Handle success (redirect, show message, etc.)
       if (response.status === 200) {
-        console.log("User registered successfully!");
         Cookies.set("token", response.data.data.token, {
           expires: 7, // 7 days
           path: "/",

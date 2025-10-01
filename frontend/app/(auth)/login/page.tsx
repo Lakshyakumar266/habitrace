@@ -45,7 +45,6 @@ export default function Page() {
   const loginHandler = async (data: FormData) => {
     
     try {
-      console.log("Form submitted:", data);
 
       const response = await axios.post(
         "http://localhost:3001/api/v1/auth/login",
@@ -57,12 +56,10 @@ export default function Page() {
         }
       );
 
-      console.log("login successful:", response.data);
       toast.success("login successful!");
 
       // Handle success (redirect, show message, etc.)
       if (response.status === 200) {
-        console.log("User logdin successfully!");
         Cookies.set("token", response.data.data.token, {
           expires: 7, // 7 days
           path: "/",

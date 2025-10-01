@@ -15,20 +15,17 @@ import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import Cookies from 'js-cookie'
+import Cookies from "js-cookie";
 
 export default function TopNav() {
   const router = useRouter();
   const { setTheme } = useTheme();
-  const [Logdin, setLogdin] = useState(false)
+  const [Logdin, setLogdin] = useState(false);
   useEffect(() => {
-      const user =  Cookies.get("token");
-      console.log(user);
-      setLogdin(!!user)
+    const user = Cookies.get("token");
+    setLogdin(!!user);
   }, []);
-  
-  console.log(Logdin);
-  
+
 
   const handleLogout = async () => {
     try {
@@ -83,9 +80,6 @@ export default function TopNav() {
         </div>
 
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" aria-label="Create">
-            <PlusSquare className="h-5 w-5" />
-          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon">
@@ -106,45 +100,66 @@ export default function TopNav() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Notifications"
-            className="hidden sm:inline-flex"
-          >
-            <Bell className="h-5 w-5" />
-          </Button>
 
-          {Logdin?(<DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="ml-1 inline-flex items-center rounded-full outline-none ring-0"
-                aria-label="Open profile menu"
+          {Logdin ? (
+            <>
+              <Button variant="ghost" size="icon" aria-label="Create">
+                <PlusSquare className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Notifications"
+                className="hidden sm:inline-flex"
               >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage
-                    src="/diverse-avatars.png"
-                    alt="Your profile picture"
-                  />
-                  <AvatarFallback>{"LK"}</AvatarFallback>
-                </Avatar>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/profile">Profile</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/settings">Settings</Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <button onClick={handleLogout}>Log out</button>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>):("login")}
+                <Bell className="h-5 w-5" />
+              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="ml-1 inline-flex items-center rounded-full outline-none ring-0"
+                    aria-label="Open profile menu"
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src="/diverse-avatars.png"
+                        alt="Your profile picture"
+                      />
+                      <AvatarFallback>{"LK"}</AvatarFallback>
+                    </Avatar>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings">Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <button onClick={handleLogout}>Log out</button>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Open profile menu"
+                  onClick={() => router.push("/login")}
+                >
+                  Login
+                </Button>
+              </DropdownMenuTrigger>
+            </DropdownMenu>
+          )}
         </div>
       </div>
     </header>

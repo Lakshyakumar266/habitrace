@@ -1,19 +1,8 @@
 "use server";
 import { notFound } from "next/navigation";
 import axios from "axios";
-
-type Race = {
-  id: number;
-  name: string;
-  description: string;
-  raceSlug: string;
-  startDate: string;
-  endDate: string;
-  frequency: string;
-  createdBy: {
-    username: string;
-  };
-};
+import { RacePage } from "@/components/racePage/race-component";
+import { RaceSchema } from "@/utils/types";
 
 interface PageProps {
   params: Promise<{
@@ -27,13 +16,14 @@ export default async function Page({ params }: PageProps) {
     const raceUrl = await `http://localhost:3001/api/v1/race/${raceSlug}`;
     const response = await axios.get(raceUrl);
 
-    const raceData: Race = response.data.data;
-    return (
-      <div>
-        <h1>{raceData.name}</h1>
-        {/* Your page content */}
-      </div>
-    );
+    let raceData: RaceSchema = response.data.data;
+
+    raceData = {
+      ...raceData,
+      participantCount: raceData.participants?.length ?? 0,
+    };
+
+    return <RacePage raceData={raceData} />;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error.response?.status === 404) {
