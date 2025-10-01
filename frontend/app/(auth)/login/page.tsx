@@ -43,7 +43,6 @@ export default function Page() {
 
   // ✅ Now registerHandler can be defined after useForm
   const loginHandler = async (data: FormData) => {
-    console.log("HIIIIIIIIIIII");
     
     try {
       console.log("Form submitted:", data);

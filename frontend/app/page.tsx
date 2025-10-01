@@ -11,7 +11,7 @@ export default function Home() {
   }, [router]);
   return (
     <>
-    <Hero01 />
+      <Hero01 />
     </>
   );
 }

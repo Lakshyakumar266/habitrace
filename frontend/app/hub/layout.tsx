@@ -1,7 +1,6 @@
 import type React from "react";
 import "../globals.css";
 import TopNav from "@/components/top-nav";
-import SideNav from "@/components/side-nav";
 import { Suspense } from "react";
 
 export default function RootLayout({
@@ -10,8 +9,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
-      
+    <div>
         <Suspense fallback={<div>Loading...</div>}>
           <TopNav />
           <div className="mx-auto flex w-full max-w-screen-2xl">
@@ -19,6 +17,6 @@ export default function RootLayout({
           </div>
         </Suspense>
         {/* <Analytics /> */}
-    </>
+    </div>
   );
 }

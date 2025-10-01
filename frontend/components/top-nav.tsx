@@ -14,10 +14,21 @@ import {
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+import Cookies from 'js-cookie'
 
 export default function TopNav() {
   const router = useRouter();
   const { setTheme } = useTheme();
+  const [Logdin, setLogdin] = useState(false)
+  useEffect(() => {
+      const user =  Cookies.get("token");
+      console.log(user);
+      setLogdin(!!user)
+  }, []);
+  
+  console.log(Logdin);
+  
 
   const handleLogout = async () => {
     try {
@@ -104,7 +115,7 @@ export default function TopNav() {
             <Bell className="h-5 w-5" />
           </Button>
 
-          <DropdownMenu>
+          {Logdin?(<DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 className="ml-1 inline-flex items-center rounded-full outline-none ring-0"
@@ -130,10 +141,10 @@ export default function TopNav() {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <Button onClick={handleLogout}>Log out</Button>
+                <button onClick={handleLogout}>Log out</button>
               </DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu>):("login")}
         </div>
       </div>
     </header>
