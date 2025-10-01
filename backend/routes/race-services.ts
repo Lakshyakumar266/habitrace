@@ -9,7 +9,7 @@ const router = Router()
 
 router.route("/").post(authMiddleware, createRaceMiddleware, async (req, res) => {
     const { name: raceName, description: raceDescription, startDate: raceStartingDate, endDate: raceEndingDate, frequency: raceFrequency } = req.body;
-    const raceSlug = String(raceName + `_race`).replaceAll(' ', '_')
+    const raceSlug = String(raceName + `_${raceFrequency}`).replaceAll(' ', '_')
 
     try {
         const createRace = await prisma.race.create({
@@ -91,14 +91,31 @@ router.route("/:raceSlug").get(async (req, res) => {
         const race = await prisma.race.findFirst({
             where: {
                 raceSlug: raceSlug
+            },select:{
+                id:true,
+                raceSlug:true,
+                name:true,
+                description:true,
+                startDate:true,
+                endDate:true,
+                frequency:true,
+                createdById:true,
+                createdAt:true,
+                createdBy:{
+                    select:{
+                        username:true
+                    }
+                },
+                participants:true,
             }
 
         })
 
-        console.log(race);
-        
-        if (!race) return res.status(404).send({message: "No Race Found",
-            success: false,data:null})
+
+        if (!race) return res.status(404).send({
+            message: "No Race Found",
+            success: false, data: null
+        })
         return res.status(200).send({
             message: "found race",
             success: true,
@@ -125,8 +142,6 @@ router.route("/:raceSlug/join").post(authMiddleware, async (req, res) => {
                 raceSlug: raceSlug
             }
         })
-        console.log(race?.id);
-        console.log(userId);
 
 
         if (!race) return res.status(404).send({
@@ -352,7 +367,6 @@ router.route('/:raceSlug/streak').get(authMiddleware, async (req, res) => {
 
         const checkins = await prisma.checkin.findMany({ where: { participation: { raceId: race.id, userId: userUuid } } });
 
-        // console.log(participant);
 
         const leaderboard = await persnalStreak(participant, checkins);
 
