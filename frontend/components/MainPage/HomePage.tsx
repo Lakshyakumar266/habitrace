@@ -28,7 +28,7 @@ const Hero01 = () => {
           </span>
         </p>
         <div className="mt-12 flex items-center justify-center gap-4">
-          <Link href={"/hub"}>
+          <Link href={"/login"}>
             <Button size="lg" className="rounded-full text-base">
               Start Racing <ArrowUpRight className="size-5" />
             </Button>
