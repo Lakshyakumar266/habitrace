@@ -25,6 +25,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { BACKEND_URL } from "@/config";
 
 export default function Page() {
   const router = useRouter();
@@ -47,7 +48,7 @@ export default function Page() {
     try {
 
       const response = await axios.post(
-        "http://localhost:3001/api/v1/auth/login",
+        `${BACKEND_URL}api/v1/auth/login`,
         data,
         {
           headers: {
@@ -55,6 +56,8 @@ export default function Page() {
           },
         }
       );
+      console.log(response);
+      
 
       toast.success("login successful!");
 
@@ -67,7 +70,7 @@ export default function Page() {
           sameSite: "strict",
         });
 
-        router.push("/");
+        router.push("/hub");
       }
     } catch (error) {
       console.error("Registration error:", error);

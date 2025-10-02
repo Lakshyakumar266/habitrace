@@ -6,25 +6,66 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Users, Trophy, Zap, User } from "lucide-react";
 import { format } from "date-fns";
-import { RaceSchema } from "@/utils/types";
+import { LeaderboardEntry, RaceSchema } from "@/utils/types";
+import { BACKEND_URL } from "@/config";
+import axios from "axios";
+import cookies from "js-cookie";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-/*
-TODO:
-down there, also add the leaderboard table 
-showing the name, streak, and position. that will come from different api call so by default keep it empty
-*/
 
-export function RacePage({ raceData }: { raceData: object }) {
+export function RacePage({
+  raceData,
+  leaderboardData,
+}: {
+  raceData: object;
+  leaderboardData: LeaderboardEntry[];
+}) {
+  const router = useRouter();
   const [joining, setJoining] = useState(false);
 
   const race = raceData as RaceSchema;
 
-  function handleJoinRace() {
+  const leaderboard: LeaderboardEntry[] = leaderboardData;
+
+  console.log(cookies.get("token"));
+  async function handleJoinRace() {
+    if (!cookies.get("token")) {
+      toast("Login to join race");
+      router.push("/login");
+    }
     setJoining(true);
-    setTimeout(() => {
-      alert("Race joined successfully!");
+    try {
+      const response = await axios.post(
+        `${BACKEND_URL}api/v1/race/${race.raceSlug}/join`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies.get("token")}`,
+            withCredentials: true,
+          },
+        }
+      );
+
       setJoining(false);
-    }, 1000);
+      if (response.status === 201) {
+        toast("Race joined successfully!");
+      } else {
+        toast("Can't join race now, try again later.");
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      setJoining(false);
+
+      if (error.status === 409) {
+        toast("You have already joined this race.");
+      } else if (error.status === 404) {
+        toast("Race does not exist.");
+      } else if (error.status === 500) {
+        toast("Server error, try again later.");
+      }
+    }
   }
 
   const startDate = new Date(race.startDate);
@@ -159,6 +200,82 @@ export function RacePage({ raceData }: { raceData: object }) {
                     </span>
                   </li>
                 </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-slate-200 dark:border-slate-800 shadow-sm">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                  Leaderboard
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-slate-200 dark:border-slate-800">
+                        <th className="text-left py-3 px-2 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                          Rank
+                        </th>
+                        <th className="text-left py-3 px-2 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                          Name
+                        </th>
+                        <th className="text-right py-3 px-2 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                          Streak
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {leaderboard.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} className="py-12 text-center">
+                            <div className="flex flex-col items-center gap-3">
+                              <Users className="h-12 w-12 text-slate-300 dark:text-slate-700" />
+                              <p className="text-sm text-slate-500 dark:text-slate-400">
+                                No participants yet
+                              </p>
+                              <p className="text-xs text-slate-400 dark:text-slate-500">
+                                Be the first to join and claim the top spot!
+                              </p>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : (
+                        leaderboard.map((entry) => (
+                          <tr
+                            key={entry.position}
+                            className="border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                          >
+                            <td className="py-3 px-2">
+                              <div className="flex items-center gap-2">
+                                {entry.position === 1 && (
+                                  <span className="text-lg">🥇</span>
+                                )}
+                                {entry.position === 2 && (
+                                  <span className="text-lg">🥈</span>
+                                )}
+                                {entry.position === 3 && (
+                                  <span className="text-lg">🥉</span>
+                                )}
+                                <span className="font-semibold text-slate-900 dark:text-slate-100">
+                                  #{entry.position}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="py-3 px-2 text-slate-700 dark:text-slate-300">
+                              {entry.name}
+                            </td>
+                            <td className="py-3 px-2 text-right">
+                              <span className="inline-flex items-center gap-1 font-semibold text-orange-600 dark:text-orange-400">
+                                <Zap className="h-4 w-4" />
+                                {entry.streak}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </CardContent>
             </Card>
           </div>

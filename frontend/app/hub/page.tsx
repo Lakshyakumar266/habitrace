@@ -1,8 +1,9 @@
 "use client";
 
-import RaceCardHub from "@/components/shadcn-studio/card/card-11";
+import RaceCardHub from "@/components/race-cardComponent";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { BACKEND_URL } from "../../config";
 
 type Card = {
   id: number;
@@ -20,7 +21,7 @@ type Card = {
 export default function Page() {
   const [cards, setCards] = useState<Card[]>([]);
   useEffect(() => {
-    axios.get("http://localhost:3001/api/v1/race/").then((response) => {
+    axios.get(`${BACKEND_URL}api/v1/race/`).then((response) => {
 
       setCards(response.data.data);
     });

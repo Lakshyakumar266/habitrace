@@ -16,16 +16,30 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import { decode, JwtPayload } from "jsonwebtoken";
+
+interface userSchema extends JwtPayload {
+  uuid: string;
+  username: string;
+}
 
 export default function TopNav() {
   const router = useRouter();
   const { setTheme } = useTheme();
   const [Logdin, setLogdin] = useState(false);
+  const [User, setUser] = useState<userSchema>({} as userSchema);
   useEffect(() => {
     const user = Cookies.get("token");
+    const decodedToken = decode(String(user));
+    let decoded;
+    if (typeof decodedToken === "string") {
+      decoded = JSON.parse(decodedToken);
+    } else if (decodedToken && typeof decodedToken === "object") {
+      decoded = decodedToken;
+    }
+    setUser(decoded);
     setLogdin(!!user);
   }, []);
-
 
   const handleLogout = async () => {
     try {
@@ -134,7 +148,7 @@ export default function TopNav() {
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/profile">Profile</Link>
+                    <Link href={`/profile/${User.username}`}>Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/settings">Settings</Link>

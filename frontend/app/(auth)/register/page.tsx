@@ -20,11 +20,12 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import {signupformSchema as formSchema} from "@/schemas/fromSchema";
+import { signupformSchema as formSchema } from "@/schemas/fromSchema";
 import axios from "axios";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { BACKEND_URL } from "@/config";
 
 export default function Page() {
   const router = useRouter();
@@ -46,9 +47,8 @@ export default function Page() {
   // ✅ Now registerHandler can be defined after useForm
   const registerHandler = async (data: FormData) => {
     try {
-
       const response = await axios.post(
-        "http://localhost:3001/api/v1/auth/register",
+        `${BACKEND_URL}api/v1/auth/register`,
         data,
         {
           headers: {
@@ -68,15 +68,17 @@ export default function Page() {
           sameSite: "strict",
         });
 
-        router.push("/");
+        router.push("/hub");
       }
     } catch (error) {
-      console.error("Registration error:", error);
-
       if (axios.isAxiosError(error)) {
-        // Axios error with response from server
-        if (error.response?.status === 401) {
-          toast.error("Check the credentials you provided!");
+        if (error.response?.status === 409) {
+          if (error.response?.data?.data?.username) {
+            toast.error("Username already taken!");
+          }
+          if (error.response?.data?.data?.email) {
+            toast.error("email already taken!");
+          }
         }
       }
     }

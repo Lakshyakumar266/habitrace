@@ -19,3 +19,9 @@ export interface RaceSchema {
   participants?: Participant[];
 }
 
+export interface LeaderboardEntry {
+  position: number;
+  name: string;
+  streak: number;
+}
+

@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 import {
-  BadgeCheckIcon,
   HeartIcon,
   Globe,
   Share2,
@@ -56,7 +55,7 @@ const RaceCardHub: React.FC<RaceCardHubProps> = ({
   frequency,
   createdBy,
 }) => {
-  const [liked, setLiked] = useState<boolean>(true);
+  const [liked, setLiked] = useState<boolean>(false);
 
   return (
     <Card className={`${className}`}>
