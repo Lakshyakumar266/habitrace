@@ -84,7 +84,10 @@ export default function Page() {
     }
   };
 
-  const googleLoginHandler = () => {};
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const googleLoginHandler = () => {
+    // TODO: Implement google login
+  };
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
