@@ -1,5 +1,16 @@
 import prisma from "./prisma.utility";
 
+const getPosition = (participants: any[]) => {
+
+    return participants.map((participant, index) => {
+        return {
+            position: index + 1,
+            name: participant.username,
+            streak: participant.streak
+        }
+    });
+};
+
 const groupLeaderboard = async (participants: any[], checkins: any[]) => {
 
     const participantCheckinsArray = participants.map(participant => {
@@ -9,7 +20,7 @@ const groupLeaderboard = async (participants: any[], checkins: any[]) => {
 
         return {
             user: participant.id,
-            checkins: userCheckins
+            checkins: userCheckins,
         };
     });
 
@@ -18,11 +29,13 @@ const groupLeaderboard = async (participants: any[], checkins: any[]) => {
 
         const user = await prisma.user.findFirst({ where: { participations: { some: { id: participant.user } } } })
 
+
         return {
             username: user?.username,
-            streak: participant.checkins.length
+            streak: participant.checkins.length,
+            position: 0
         }
-    })
+    });
 
     return usersStreak
 }
@@ -44,4 +57,4 @@ const persnalStreak = (participant: any, checkins: any[]) => {
 
 }
 
-export { groupLeaderboard, persnalStreak };
+export { groupLeaderboard, persnalStreak, getPosition };

@@ -3,7 +3,7 @@ import { authMiddleware } from "../middlewares/auth-middleware";
 import prisma from "../utils/prisma.utility";
 import { createRaceMiddleware } from "../middlewares/race-middleware";
 import { checkRaceValidity } from "../middlewares/raceCheckin-middleware";
-import { groupLeaderboard, persnalStreak } from "../utils/streakActions";
+import { getPosition, groupLeaderboard, persnalStreak } from "../utils/streakActions";
 
 const router = Router()
 
@@ -91,22 +91,22 @@ router.route("/:raceSlug").get(async (req, res) => {
         const race = await prisma.race.findFirst({
             where: {
                 raceSlug: raceSlug
-            },select:{
-                id:true,
-                raceSlug:true,
-                name:true,
-                description:true,
-                startDate:true,
-                endDate:true,
-                frequency:true,
-                createdById:true,
-                createdAt:true,
-                createdBy:{
-                    select:{
-                        username:true
+            }, select: {
+                id: true,
+                raceSlug: true,
+                name: true,
+                description: true,
+                startDate: true,
+                endDate: true,
+                frequency: true,
+                createdById: true,
+                createdAt: true,
+                createdBy: {
+                    select: {
+                        username: true
                     }
                 },
-                participants:true,
+                participants: true,
             }
 
         })
@@ -163,12 +163,20 @@ router.route("/:raceSlug/join").post(authMiddleware, async (req, res) => {
             data: userParticipate
         })
 
-    } catch (error) {
-        return res.status(404).send({
+    } catch (error:any) {        
+        if (error.code === "P2002") {
+            return res.status(409).send({
+                message: "User has already joined this race.",
+                success: false,
+                data: {}
+            });
+        }
+
+        return res.status(500).send({
             message: "Can't join race server error",
             success: false,
             data: error
-        })
+        });
     }
 
 
@@ -319,20 +327,19 @@ router.route("/:raceSlug/leaderboard").get(async (req, res) => {
 
         const leaderboard = await groupLeaderboard(participants, checkins);
 
-        const leaderboardArry = await Promise.all(leaderboard.map(async item => {
+        let leaderboardArray: any[] = await Promise.all(leaderboard.map(async item => {
             const value = await Promise.resolve(item);
             return value;
         }));
 
-        console.log(leaderboardArry);
-
-
+        leaderboardArray = getPosition(leaderboardArray)
 
         return res.status(200).send({
             message: "found race",
             success: true,
-            data: leaderboardArry
+            data: leaderboardArray
         })
+
     } catch (error) {
         return res.status(401).send({
             message: "No Race Found",

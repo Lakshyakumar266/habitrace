@@ -12,13 +12,21 @@ const app = express()
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+
+app.use(cors({
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: '*',
+    credentials: true
+}));
+// app.options('*', cors());
+
 
 // routes
 app.use('/api/v1/auth', authRouter)
 
-app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/race', raceRouter)
+app.use('/api/v1/user', usersRouter)
 
 
 

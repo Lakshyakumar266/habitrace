@@ -12,35 +12,42 @@ const router = Router()
 router.route("/register").post(registerMiddleware, async (req, res) => {
 
     const { username, fullName, fullname, email, password, pic } = req.body;
-    
+
     const passwordHash = await hash(password, 10);
-    
-    const result = await prisma.user.create({
-        data: {
-            username: username,
-            fullName: fullName ?? fullname,
-            pic: (pic? pic : "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"),
-            email: email,
-            passwordHash: passwordHash,
-        }
-    });
+    try {
+        const result = await prisma.user.create({
+            data: {
+                username: username,
+                fullName: fullName ?? fullname,
+                pic: (pic ? pic : "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"),
+                email: email,
+                passwordHash: passwordHash,
+            }
+        });
 
 
-    const token = jwt.sign(
-        {
-            uuid: result.id?.toString(),
-            username: result.username
-        },
-        String(process.env.SECRET_KEY), {
-        expiresIn: '2d',
-    });
+        const token = jwt.sign(
+            {
+                uuid: result.id?.toString(),
+                username: result.username
+            },
+            String(process.env.SECRET_KEY), {
+            expiresIn: '2d',
+        });
 
 
-    return res.send({
-        message: "user created successfully",
-        success: true,
-        data: { token: token }
-    })
+        return res.send({
+            message: "user created successfully",
+            success: true,
+            data: { token: token }
+        })
+    } catch (error) {
+        return res.status(401).send({
+            message: "user created failed",
+            success: false,
+            data: {}
+        })
+    }
 
 })
 
