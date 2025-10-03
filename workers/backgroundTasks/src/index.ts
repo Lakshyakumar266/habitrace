@@ -34,7 +34,7 @@ const sendEmail = async (email: string, username: string) => {
     message.sender = { name: "HabitRace", email: "cherrysoni255@gmail.com" };
     message.to = [{ email: email, name: username }];
 
-    emailAPI
+    await emailAPI
         .sendTransacEmail(message)
         .then((res) => {
             console.log("DONE SENDING EMAIL TO ->", email);
@@ -56,11 +56,9 @@ while (true) {
 
             await sendEmail(userEmail, username);
 
-            const publishInAppNotification = await client.publish(`notifications:${username}`, JSON.stringify({ type: "notification", payload: { message: `Welcome to HabitRace ${username}` } }))
+            await client.publish(`notifications:${username}`, JSON.stringify({ type: "notification", payload: { message: `Welcome to HabitRace ${username}` } }))
 
-            if (publishInAppNotification === 1) {
-                console.log("PUBLISHED IN APP NOTIFICATION FOR USER ->", username);
-            }
+            console.log("PUBLISHED IN APP NOTIFICATION FOR USER ->", username);
         }
     }
 }

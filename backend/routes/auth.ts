@@ -37,6 +37,7 @@ router.route("/register").post(registerMiddleware, async (req, res) => {
         });
 
         redisClient.lPush(`backgroundTasks`, JSON.stringify({ type: "notification", data: { username: result.username, email: result.email } }));
+        
 
         return res.send({
             message: "user created successfully",
@@ -47,7 +48,7 @@ router.route("/register").post(registerMiddleware, async (req, res) => {
         return res.status(401).send({
             message: "user created failed",
             success: false,
-            data: {}
+            data: {error}
         })
     }
 

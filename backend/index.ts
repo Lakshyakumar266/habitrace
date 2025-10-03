@@ -1,13 +1,11 @@
-// import { PrismaClient, type User } from "./generated/prisma";
-// import { hash } from 'bcrypt';
 import express from 'express'
 import cors from 'cors'
 import authRouter from './routes/auth'
 import usersRouter from './routes/users'
 import raceRouter from './routes/race-services'
-import notificationRouter from './routes/notification-services'
+import notificationRouter, { notificationHandler } from './routes/notification-services'
+import { WebSocketServer, WebSocket } from 'ws'
 
-// const prisma = new PrismaClient();
 
 const app = express()
 
@@ -30,8 +28,18 @@ app.use('/api/v1/race', raceRouter)
 app.use('/api/v1/user', usersRouter)
 app.use('/api/v1/notification', notificationRouter)
 
-
-
-app.listen(process.env.PORT, () => {
-    console.log(`HabbitRacer Server listening on port ${process.env.PORT}`)
+const httpServer = app.listen(process.env.APP_PORT, () => {
+    console.log(`HabbitRacer Server listening on port ${process.env.APP_PORT}`)
 })
+
+const socketServer = new WebSocketServer({ server: httpServer });
+
+socketServer.on('connection', function connection(socket: any, req: any) {
+
+    const username = new URLSearchParams(req.url.split('?')[1]).get('username');
+    socket.username = username;
+    socket.on('message', function message(data: any, isBinary: any) {
+        const messageString = isBinary ? data.toString('utf-8') : data.toString();
+        notificationHandler(messageString, socket)
+    });
+});
