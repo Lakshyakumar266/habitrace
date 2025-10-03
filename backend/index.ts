@@ -5,6 +5,7 @@ import cors from 'cors'
 import authRouter from './routes/auth'
 import usersRouter from './routes/users'
 import raceRouter from './routes/race-services'
+import notificationRouter from './routes/notification-services'
 
 // const prisma = new PrismaClient();
 
@@ -27,6 +28,7 @@ app.use('/api/v1/auth', authRouter)
 
 app.use('/api/v1/race', raceRouter)
 app.use('/api/v1/user', usersRouter)
+app.use('/api/v1/notification', notificationRouter)
 
 
 

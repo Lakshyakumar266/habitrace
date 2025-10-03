@@ -5,6 +5,7 @@ import { PrismaClient } from "../generated/prisma";
 import jwt from 'jsonwebtoken'
 import prisma from "../utils/prisma.utility";
 import { CreateUser } from "../types";
+import redisClient from "../utils/redis.utility";
 
 
 const router = Router()
@@ -35,6 +36,7 @@ router.route("/register").post(registerMiddleware, async (req, res) => {
             expiresIn: '2d',
         });
 
+        redisClient.lPush(`backgroundTasks`, JSON.stringify({ type: "notification", data: { username: result.username, email: result.email } }));
 
         return res.send({
             message: "user created successfully",

@@ -32,7 +32,7 @@ router.route("/:username").get(async (req, res) => {
 
 router.route("/:username/update").patch(authMiddleware, async (req, res) => {
     const updateData = req.body;
-
+    
     const URLusername = req.params.username
     const UserUsername = res.locals.user.username;
 

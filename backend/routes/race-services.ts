@@ -84,6 +84,60 @@ router.route("/").get(async (req, res) => {
 
 
 
+router.route("/leaderboard").get(async (req, res) => {
+    
+    const raceSlug: string = String(req.query.race);
+
+    try {
+
+        const race = await prisma.race.findFirst({ where: { raceSlug: raceSlug } });
+        if (!race) {
+            return res.status(404).send({
+                message: "No Race Found",
+                success: false,
+                data: {}
+            })
+        }
+
+        const participants = await prisma.participation.findMany({ where: { raceId: race.id, joined: true } });
+        if (!participants) {
+            return res.status(404).send({
+                message: "Race is Empty.",
+                success: false,
+                data: {}
+            })
+        }
+
+        const checkins = await prisma.checkin.findMany({ where: { participation: { raceId: race.id } } });
+
+        const leaderboard = await groupLeaderboard(participants, checkins);
+
+        let leaderboardArray: any[] = await Promise.all(leaderboard.map(async item => {
+            const value = await Promise.resolve(item);
+            return value;
+        }));
+
+        leaderboardArray = getPosition(leaderboardArray)
+
+        return res.status(200).send({
+            message: "found race",
+            success: true,
+            data: leaderboardArray
+        })
+
+    } catch (error) {
+        return res.status(401).send({
+            message: "No Race Found",
+            success: false,
+            data: error
+        })
+    }
+
+}) // Get leaderboard for a race
+
+
+
+
 router.route("/:raceSlug").get(async (req, res) => {
     const raceSlug = req.params.raceSlug;
     try {
@@ -163,7 +217,7 @@ router.route("/:raceSlug/join").post(authMiddleware, async (req, res) => {
             data: userParticipate
         })
 
-    } catch (error:any) {        
+    } catch (error: any) {
         if (error.code === "P2002") {
             return res.status(409).send({
                 message: "User has already joined this race.",
@@ -299,56 +353,6 @@ router.route("/:raceSlug/checkin").post(authMiddleware, checkRaceValidity, async
 }) // Race Daily check-in
 
 
-
-router.route("/:raceSlug/leaderboard").get(async (req, res) => {
-
-    const raceSlug = req.params.raceSlug;
-    try {
-
-        const race = await prisma.race.findFirst({ where: { raceSlug: raceSlug } });
-        if (!race) {
-            return res.status(404).send({
-                message: "No Race Found",
-                success: false,
-                data: {}
-            })
-        }
-
-        const participants = await prisma.participation.findMany({ where: { raceId: race.id, joined: true } });
-        if (!participants) {
-            return res.status(404).send({
-                message: "Race is Empty.",
-                success: false,
-                data: {}
-            })
-        }
-
-        const checkins = await prisma.checkin.findMany({ where: { participation: { raceId: race.id } } });
-
-        const leaderboard = await groupLeaderboard(participants, checkins);
-
-        let leaderboardArray: any[] = await Promise.all(leaderboard.map(async item => {
-            const value = await Promise.resolve(item);
-            return value;
-        }));
-
-        leaderboardArray = getPosition(leaderboardArray)
-
-        return res.status(200).send({
-            message: "found race",
-            success: true,
-            data: leaderboardArray
-        })
-
-    } catch (error) {
-        return res.status(401).send({
-            message: "No Race Found",
-            success: false,
-            data: error
-        })
-    }
-
-}) // Get leaderboard for a race
 
 router.route('/:raceSlug/streak').get(authMiddleware, async (req, res) => {
     const raceSlug = req.params.raceSlug;
