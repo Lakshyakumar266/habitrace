@@ -2,12 +2,10 @@ import { createClient } from "redis";
 import { REDIS_URL, SMTP_API } from "./config.js";
 import { TransactionalEmailsApi, SendSmtpEmail } from "@getbrevo/brevo";
 
-
 const client = createClient({
     url: REDIS_URL
 });
 
-// Handle errors
 client.on("error", (err) => {
     console.error("Redis Client Error: ", err);
 });
@@ -20,7 +18,6 @@ async function conect() {
     client.on("error", (err) => {
         console.log("Redis Client Error", err);
     });
-
 
 }
 conect();
@@ -67,4 +64,3 @@ while (true) {
         }
     }
 }
-
