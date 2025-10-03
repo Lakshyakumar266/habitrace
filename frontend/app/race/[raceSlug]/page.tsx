@@ -20,7 +20,7 @@ export default async function Page({ params }: PageProps) {
 
     const leaderboardResponse = async () => {
       return await axios.get(
-        `${BACKEND_URL}api/v1/race/${raceSlug}/leaderboard`
+        `${BACKEND_URL}api/v1/race/leaderboard?race=${raceSlug}`
       );
     };
 
