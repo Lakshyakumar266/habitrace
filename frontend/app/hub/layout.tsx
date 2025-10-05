@@ -2,6 +2,7 @@ import type React from "react";
 import "../globals.css";
 import TopNav from "@/components/top-nav";
 import { Suspense } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function RootLayout({
   children,
@@ -10,13 +11,19 @@ export default function RootLayout({
 }>) {
   return (
     <div>
-        <Suspense fallback={<div>Loading...</div>}>
-          <TopNav />
-          <div className="mx-auto flex w-full max-w-screen-2xl">
-            <div className="flex-1">{children}</div>
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center h-screen">
+            <Spinner className="size-8" />
           </div>
-        </Suspense>
-        {/* <Analytics /> */}
+        }
+      >
+        <TopNav />
+        <div className="mx-auto flex w-full max-w-screen-2xl">
+          <div className="flex-1">{children}</div>
+        </div>
+      </Suspense>
+      {/* <Analytics /> */}
     </div>
   );
 }

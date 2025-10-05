@@ -25,3 +25,13 @@ export interface LeaderboardEntry {
   streak: number;
 }
 
+export interface RaceCardHubProps {
+  className?: string;
+  title: string;
+  description?: string;
+  sDate: string;
+  eDate: string;
+  link: string;
+  frequency: string;
+  createdBy?: string;
+}

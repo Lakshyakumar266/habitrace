@@ -28,7 +28,6 @@ export function RacePage({
 
   const leaderboard: LeaderboardEntry[] = leaderboardData;
 
-  console.log(cookies.get("token"));
   async function handleJoinRace() {
     if (!cookies.get("token")) {
       toast("Login to join race");

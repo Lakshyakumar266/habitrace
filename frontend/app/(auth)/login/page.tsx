@@ -56,7 +56,6 @@ export default function Page() {
           },
         }
       );
-      console.log(response);
       
 
       toast.success("login successful!");

@@ -6,14 +6,14 @@ import React from "react";
 
 const Hero01 = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center px-6">
+    <div className="min-h-screen flex items-center justify-center px-6 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/grid-2.png)' }}>
       <div className="text-center max-w-3xl">
         <Badge
           variant="secondary"
           className="rounded-full py-1 border-border"
           asChild
         >
-          <Link href="#">
+          <Link href="#" className="cursor-pointer">
             Just released v1.0.0 <ArrowUpRight className="ml-1 size-4" />
           </Link>
         </Badge>
@@ -29,7 +29,7 @@ const Hero01 = () => {
         </p>
         <div className="mt-12 flex items-center justify-center gap-4">
           <Link href={"/login"}>
-            <Button size="lg" className="rounded-full text-base">
+            <Button size="lg" className="rounded-full text-base cursor-pointer">
               Start Racing <ArrowUpRight className="size-5" />
             </Button>
           </Link>
@@ -37,7 +37,7 @@ const Hero01 = () => {
             <Button
               variant="outline"
               size="lg"
-              className="rounded-full text-base shadow-none"
+              className="rounded-full text-base shadow-lg cursor-pointer"
             >
               <CirclePlay className="size-5" /> View Leaderboards
             </Button>

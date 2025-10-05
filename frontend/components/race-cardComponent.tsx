@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 
-import {
-  HeartIcon,
-  Globe,
-  Share2,
-  CirclePlus,
-} from "lucide-react";
+import { HeartIcon, Globe, CirclePlus, Share2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,16 +17,8 @@ import {
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-interface RaceCardHubProps {
-  className?: string;
-  title?: string;
-  description?: string;
-  sDate?: string;
-  eDate?: string;
-  link?: string;
-  frequency?: string;
-  createdBy?: string;
-}
+import { RaceCardHubProps } from "@/utils/types";
+import { handleShare } from "@/hooks/share-link";
 
 const convertDate = (dateString: string | undefined) => {
   if (dateString) {
@@ -56,6 +43,14 @@ const RaceCardHub: React.FC<RaceCardHubProps> = ({
   createdBy,
 }) => {
   const [liked, setLiked] = useState<boolean>(false);
+  // const username =
+
+  const shareData = {
+    title: `🏁 ${title} | HabitRace`,
+    text: `🔥 I'm joining the  ${title.toUpperCase()} race on HabitRace! \n🚀 Let’s build the habit, stay consistent 💪 and climb the leaderboard together 🏆\n Join me here 👉 ${
+      window.location.origin
+    }/race/${link}`,
+  };
 
   return (
     <Card className={`${className}`}>
@@ -75,10 +70,10 @@ const RaceCardHub: React.FC<RaceCardHubProps> = ({
           </div>
         </div>
         <Link href={`/race/${link}`}>
-        <Button variant="outline" size="sm">
-          <CirclePlus className="size-4" />
-          Race
-        </Button>
+          <Button variant="outline" size="sm" className="cursor-pointer">
+            <CirclePlus className="size-4" />
+            Race
+          </Button>
         </Link>
       </CardHeader>
       <CardContent className="space-y-6 text-md dark:text-gray-200">
@@ -118,7 +113,12 @@ const RaceCardHub: React.FC<RaceCardHubProps> = ({
           <Globe className="size-4" />
           1.1K
         </Button>
-        <Button variant="ghost" size="sm">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="cursor-pointer"
+          onClick={() => handleShare(shareData)}
+        >
           <Share2 className="size-4" />
         </Button>
       </CardFooter>
