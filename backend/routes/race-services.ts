@@ -85,7 +85,7 @@ router.route("/").get(async (req, res) => {
 
 
 router.route("/leaderboard").get(async (req, res) => {
-    
+
     const raceSlug: string = String(req.query.race);
 
     try {
@@ -140,9 +140,11 @@ router.route("/leaderboard").get(async (req, res) => {
 
 router.route("/:raceSlug").get(async (req, res) => {
     const raceSlug = req.params.raceSlug;
+    const { uuid } = req.query;
+
     try {
 
-        const race = await prisma.race.findFirst({
+        let race: any = await prisma.race.findFirst({
             where: {
                 raceSlug: raceSlug
             }, select: {
@@ -162,9 +164,16 @@ router.route("/:raceSlug").get(async (req, res) => {
                 },
                 participants: true,
             }
-
         })
 
+        /* 
+            EXPLANATION OF BELOW CODE: isJoined is a boolean value that indicates whether the user has joined the race or not. If the user is not logged in, it will return false. If the user is logged in, it will check if the user has already joined the race. If the user has already joined, it will return true, otherwise it will return false. 
+        */
+
+        race = {
+            ...race,
+            isJoined: (!uuid ? false : (await prisma.participation.findFirst({ where: { userId: uuid as string, raceId: race.id } }) ? true : false))
+        }
 
         if (!race) return res.status(404).send({
             message: "No Race Found",
@@ -232,8 +241,14 @@ router.route("/:raceSlug/join").post(authMiddleware, async (req, res) => {
             data: error
         });
     }
+}) // Join a race
 
-
+router.route("/:raceSlug/invite").post(authMiddleware, async (req, res) => {
+    return res.status(500).send({
+        message: "Can't join race server error",
+        success: false,
+        data: {}
+    });
 }) // Join a race
 
 
@@ -394,7 +409,6 @@ router.route('/:raceSlug/streak').get(authMiddleware, async (req, res) => {
             data: error
         })
     }
-
 })
 
 export default router;
