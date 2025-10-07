@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import localFont from 'next/font/local'
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -22,6 +23,10 @@ interface userSchema extends JwtPayload {
   uuid: string;
   username: string;
 }
+const harmoneFont = localFont({
+  src: '../assets/fonts/harmone/harmone.ttf',
+  weight:'400',
+});;
 
 export default function TopNav() {
   const router = useRouter();
@@ -74,7 +79,7 @@ export default function TopNav() {
       <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-4">
         <div className="flex items-center gap-3">
           <Link href="/hub" className="font-semibold tracking-tight">
-            <span className="text-pretty">HabitRace</span>
+            <span className={`text-pretty ${harmoneFont.className} text-2xl`}>HabitRace</span>
             <span className="sr-only">Go to homepage</span>
           </Link>
         </div>

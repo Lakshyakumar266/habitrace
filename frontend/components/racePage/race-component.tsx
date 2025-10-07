@@ -4,7 +4,19 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Users, Trophy, Zap, User } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  Users,
+  Trophy,
+  Zap,
+  User,
+  Link2,
+  UserPlus,
+  Check,
+  Copy,
+  Mail,
+} from "lucide-react";
 import { format } from "date-fns";
 import { LeaderboardEntry, RaceSchema } from "@/utils/types";
 import { BACKEND_URL } from "@/config";
@@ -12,7 +24,6 @@ import axios from "axios";
 import cookies from "js-cookie";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-
 
 export function RacePage({
   raceData,
@@ -25,8 +36,39 @@ export function RacePage({
   const [joining, setJoining] = useState(false);
 
   const race = raceData as RaceSchema;
-
   const leaderboard: LeaderboardEntry[] = leaderboardData;
+
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [directInviteUser, setDirectInviteUser] = useState("");
+  const raceLink = `${window.location.origin}/race/${race.raceSlug}`;
+
+  function handleCopyLink() {
+    navigator.clipboard.writeText(raceLink);
+    toast("Link copied to clipboard!");
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  }
+
+  async function handleSendDirectInvite() {
+    if (directInviteUser.trim()) {
+      const response = await axios.post(
+        `${BACKEND_URL}api/v1/race/${race.raceSlug}/invite`,
+        { user: directInviteUser.trim() },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies.get("token")}`,
+            withCredentials: true,
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      );
+      console.log(response.data);
+      
+      toast(`Invitation sent to ${directInviteUser.trim()}`);
+      setDirectInviteUser("");
+    }
+  }
 
   async function handleJoinRace() {
     if (!cookies.get("token")) {
@@ -295,7 +337,6 @@ export function RacePage({
                   {isActive && "Race is live now"}
                   {isEnded && "See you in the next race"}
                 </p>
-
                 <Button
                   size="lg"
                   onClick={handleJoinRace}
@@ -375,6 +416,80 @@ export function RacePage({
                   <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
                     Free to join • No credit card required
                   </p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-2 border-slate-200 dark:border-slate-800 shadow-sm mt-6">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
+                  <UserPlus className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                  Invite Friends
+                </h3>
+
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Link2 className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                      <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                        Share Race Link
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={raceLink}
+                        readOnly
+                        className="flex-1 px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                      />
+                      <Button
+                        onClick={handleCopyLink}
+                        className="bg-orange-600 hover:bg-orange-700 text-white"
+                      >
+                        {copiedLink ? (
+                          <>
+                            <Check className="h-4 w-4 mr-1" />
+                            Copied
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-4 w-4 mr-1" />
+                            Copy
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                      Share this link with anyone to let them join your race
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Mail className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                      <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                        Send Direct Invite
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="email"
+                        placeholder="Enter username or email"
+                        value={directInviteUser}
+                        onChange={(e) => setDirectInviteUser(e.target.value)}
+                        className="flex-1 px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                      />
+                      <Button
+                        onClick={handleSendDirectInvite}
+                        disabled={!directInviteUser.trim()}
+                        className="bg-orange-600 hover:bg-orange-700 text-white disabled:opacity-50"
+                      >
+                        Send Invite
+                      </Button>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                      Invite friends directly by their username or email address
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
