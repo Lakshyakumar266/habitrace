@@ -17,6 +17,7 @@ export interface RaceSchema {
   participantCount: number;
   createdBy: {username: string};
   participants?: Participant[];
+  isJoined: boolean;
 }
 
 export interface LeaderboardEntry {

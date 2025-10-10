@@ -4,6 +4,8 @@ import axios from "axios";
 import { RacePage } from "@/components/racePage/race-component";
 import { LeaderboardEntry, RaceSchema } from "@/utils/types";
 import { BACKEND_URL } from "@/config";
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
 
 interface PageProps {
   params: Promise<{
@@ -13,8 +15,19 @@ interface PageProps {
 
 export default async function Page({ params }: PageProps) {
   const { raceSlug } = await params;
+  const cookieStore = await cookies();
+
   try {
     const raceResponse = async () => {
+      if (cookieStore.get("token")) {
+        const cookie = cookieStore.get("token")?.value;
+        if (cookie) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const uuid = (jwt.decode(cookie) as any)?.uuid;
+          console.log(uuid);
+          return await axios.get(`${BACKEND_URL}api/v1/race/${raceSlug}?uuid=${uuid}`);
+        }
+      }
       return await axios.get(`${BACKEND_URL}api/v1/race/${raceSlug}`);
     };
 
@@ -27,11 +40,8 @@ export default async function Page({ params }: PageProps) {
     const leaderboardData: LeaderboardEntry[] = (await leaderboardResponse())
       .data.data;
 
-    let raceData: RaceSchema = (await raceResponse()).data.data;
-    raceData = {
-      ...raceData,
-      participantCount: raceData.participants?.length ?? 0,
-    };
+    const raceData: RaceSchema = (await raceResponse()).data.data;
+    console.log(raceData);
 
     return <RacePage raceData={raceData} leaderboardData={leaderboardData} />;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

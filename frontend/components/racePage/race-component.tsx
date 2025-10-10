@@ -24,6 +24,7 @@ import axios from "axios";
 import cookies from "js-cookie";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Spinner } from "../ui/spinner";
 
 export function RacePage({
   raceData,
@@ -64,7 +65,7 @@ export function RacePage({
         }
       );
       console.log(response.data);
-      
+
       toast(`Invitation sent to ${directInviteUser.trim()}`);
       setDirectInviteUser("");
     }
@@ -144,7 +145,7 @@ export function RacePage({
                 )}
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Users className="h-4 w-4" />
-                  <span>{race.participantCount} participants</span>
+                  <span>{race.participants?.length} participants</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <User className="h-4 w-4" />
@@ -340,12 +341,15 @@ export function RacePage({
                 <Button
                   size="lg"
                   onClick={handleJoinRace}
-                  disabled={joining || isEnded}
+                  disabled={joining || isEnded || race.isJoined}
                   className="w-full text-lg px-8 py-6 h-auto bg-white text-orange-600 hover:bg-orange-50 font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                 >
-                  {joining ? (
+                  {race.isJoined ? (
+                    "JOINED"
+                  ) : joining ? (
                     <>
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-orange-600 mr-2" />
+                      <Spinner />
                       Joining...
                     </>
                   ) : isEnded ? (
