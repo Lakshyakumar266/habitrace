@@ -3,6 +3,7 @@ import "../globals.css";
 import TopNav from "@/components/top-nav";
 import { Suspense } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import SideNav from "@/components/side-nav";
 
 export default function RootLayout({
   children,
@@ -10,7 +11,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div>
+    <>
       <Suspense
         fallback={
           <div className="flex items-center justify-center h-screen">
@@ -18,12 +19,15 @@ export default function RootLayout({
           </div>
         }
       >
-        <TopNav />
-        <div className="mx-auto flex w-full max-w-screen-2xl">
-          <div className="flex-1">{children}</div>
+          <TopNav />
+          <SideNav className="fixed"/>
+        <div className="flex">
+          <div className="mx-auto flex w-full max-w-screen-2xl">
+            <div className="flex-1">{children}</div>
+          </div>
         </div>
       </Suspense>
       {/* <Analytics /> */}
-    </div>
+    </>
   );
 }

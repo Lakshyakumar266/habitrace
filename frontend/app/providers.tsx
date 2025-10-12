@@ -11,7 +11,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (!mounted) {
-    return <html>{children}</html>;
+    return <>{children}</>;
   }
 
   return (
@@ -23,5 +23,5 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     >
       {children}
     </ThemeProvider>
-  ); // Wrap children with ThemeProvider after mount
+  );
 }

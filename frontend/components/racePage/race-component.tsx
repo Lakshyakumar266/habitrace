@@ -44,10 +44,14 @@ export function RacePage({
   const raceLink = `${window.location.origin}/race/${race.raceSlug}`;
 
   function handleCopyLink() {
-    navigator.clipboard.writeText(raceLink);
-    toast("Link copied to clipboard!");
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(raceLink);
+      toast("Link copied to clipboard!");
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    } else {
+      console.warn("Clipboard API not available or supported.");
+    }
   }
 
   async function handleSendDirectInvite() {
