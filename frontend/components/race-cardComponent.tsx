@@ -79,7 +79,7 @@ const RaceCardHub: React.FC<RaceCardHubProps> = ({
       <CardContent className="space-y-6 text-md dark:text-gray-200">
         <p>
           {description ? (
-            description
+            description.slice(0,250) + "..."
           ) : (
             <>
               its an race.{" "}
@@ -104,7 +104,7 @@ const RaceCardHub: React.FC<RaceCardHubProps> = ({
           <HeartIcon
             className={cn(
               "size-4",
-              liked && "fill-destructive stroke-destructive"
+            liked && "fill-destructive stroke-destructive"
             )}
           />
         </Button>

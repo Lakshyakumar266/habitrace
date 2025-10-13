@@ -158,7 +158,7 @@ export function RacePage({
               </div>
 
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-br from-orange-600 via-orange-500 to-amber-500 dark:from-orange-400 dark:via-orange-300 dark:to-amber-300 bg-clip-text text-transparent leading-tight">
-                {race.name}
+                {race.name.replace(/\b\w/g, char => char.toUpperCase())}
               </h1>
 
               <p className="text-xl text-slate-600 dark:text-slate-400 leading-relaxed">

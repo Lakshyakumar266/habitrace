@@ -19,7 +19,6 @@ export default function RootLayout({
         }
       >
           <TopNav />
-          {/* <SideNav className="fixed"/> */}
         <div className="flex">
           <div className="mx-auto flex w-full max-w-screen-2xl">
             <div className="flex-1">{children}</div>

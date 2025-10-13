@@ -180,7 +180,6 @@ export default function Page() {
 
   return (
     <main className="mx-auto max-w-full p-6 md:p-8">
-      {/* Energetic header with SVG icons and subtle gen Z microcopy */}
       <header className="mb-6">
         <div className="inline-flex items-center rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground animate-in fade-in slide-in-from-bottom-1">
           <IconRocket className="mr-1.5 size-4" aria-hidden="true" />

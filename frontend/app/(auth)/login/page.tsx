@@ -148,14 +148,6 @@ export default function Page() {
                   <Button type="submit" className="w-full">
                     Login
                   </Button>
-                  {/* <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={googleLoginHandler}
-                  >
-                    Login with Google
-                  </Button> */}
                 </div>
               </form>
             </Form>

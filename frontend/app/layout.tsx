@@ -9,7 +9,6 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -26,13 +25,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable}  antialiased`}
       >
-        <Toaster position="top-center" />
         <Providers>
+          <Toaster position="top-center" />
+          {/* <main className="bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/grid-2.png)' }}> */}
           {children}
+          {/* </main> */}
         </Providers>
       </body>
     </html>
