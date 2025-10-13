@@ -3,7 +3,6 @@ import "../globals.css";
 import TopNav from "@/components/top-nav";
 import { Suspense } from "react";
 import { Spinner } from "@/components/ui/spinner";
-import SideNav from "@/components/side-nav";
 
 export default function RootLayout({
   children,

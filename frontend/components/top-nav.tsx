@@ -32,6 +32,7 @@ export default function TopNav() {
   const router = useRouter();
   const { setTheme } = useTheme();
   const [Logdin, setLogdin] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [User, setUser] = useState<userSchema>({} as userSchema);
   useEffect(() => {
     const user = Cookies.get("token");
@@ -71,6 +72,20 @@ export default function TopNav() {
     }
   };
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Navigate to search results page with query parameter
+      router.push(`/race/search?query=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch(e);
+    }
+  };
+
   return (
     <header
       className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60"
@@ -93,6 +108,8 @@ export default function TopNav() {
               aria-hidden="true"
             />
             <input
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyUp={handleKeyPress}
               aria-label="Search"
               placeholder="Search"
               className="w-full bg-transparent outline-none placeholder:text-muted-foreground"
@@ -126,7 +143,7 @@ export default function TopNav() {
             <>
               <Button variant="ghost" size="icon" aria-label="Create">
                 <Link href="/race/create-race">
-                <PlusSquare className="h-5 w-5" />
+                  <PlusSquare className="h-5 w-5" />
                 </Link>
               </Button>
 
