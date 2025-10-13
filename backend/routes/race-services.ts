@@ -83,21 +83,22 @@ router.route("/").get(async (req, res) => {
 })  // List all races (global hub)
 
 router.route("/search").get(async (req, res) => {
-    const query = req.query.query as string;
+    const query = decodeURIComponent(req.query.query as string) as string;
     console.log(query);
-
     try {
         const races = await prisma.race.findMany({
             where: {
                 OR: [
                     {
                         name: {
-                            contains: query
+                            contains: query,
+                            mode: "insensitive"
                         }
                     },
                     {
-                        description:{
-                            contains: query
+                        description: {
+                            contains: query,
+                            mode: "insensitive"
                         }
                     }
                 ]
