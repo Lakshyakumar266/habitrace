@@ -25,14 +25,14 @@ router.route("/").post(authMiddleware, createRaceMiddleware, async (req, res) =>
         })
 
 
-        return res.status(200).send({
+        return res.status(201).send({
             message: "Race created succesfully.",
             success: true,
             data: createRace//createRace
         })
 
     } catch (error) {
-        return res.status(200).send({
+        return res.status(500).send({
             message: "server error",
             success: false,
             data: error
@@ -81,6 +81,62 @@ router.route("/").get(async (req, res) => {
         })
     }
 })  // List all races (global hub)
+
+router.route("/search").get(async (req, res) => {
+    const query = req.query.query as string;
+    console.log(query);
+
+    try {
+        const races = await prisma.race.findMany({
+            where: {
+                OR: [
+                    {
+                        name: {
+                            contains: query
+                        }
+                    },
+                    {
+                        description:{
+                            contains: query
+                        }
+                    }
+                ]
+            },
+            select: {
+                id: true,
+                raceSlug: true,
+                name: true,
+                description: true,
+                startDate: true,
+                endDate: true,
+                frequency: true,
+                createdById: true,
+                createdAt: true,
+                createdBy: {
+                    select: {
+                        username: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        })
+        return res.status(200).send({
+            message: "found races",
+            success: true,
+            data: races
+        })
+
+
+    } catch (error) {
+        return res.status(404).send({
+            message: "Database Server Error",
+            success: false,
+            data: error
+        })
+    }
+})  // Search for races (search section)
 
 
 
@@ -245,11 +301,11 @@ router.route("/:raceSlug/join").post(authMiddleware, async (req, res) => {
 
 router.route("/:raceSlug/invite").post(authMiddleware, async (req, res) => {
     return res.status(500).send({
-        message: "Can't join race server error",
+        message: "Can't send race invite internal server error",
         success: false,
         data: {}
     });
-}) // Join a race
+}) // Send invitaion to join Race
 
 
 router.route("/:raceSlug/leave").post(authMiddleware, async (req, res) => {
@@ -410,5 +466,8 @@ router.route('/:raceSlug/streak').get(authMiddleware, async (req, res) => {
         })
     }
 })
+
+
+
 
 export default router;
