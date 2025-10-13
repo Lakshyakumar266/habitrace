@@ -162,7 +162,7 @@ export function RacePage({
               </h1>
 
               <p className="text-xl text-slate-600 dark:text-slate-400 leading-relaxed">
-                {race.description}
+                {race.description?.split("METADATA:")[0]}
               </p>
             </div>
 

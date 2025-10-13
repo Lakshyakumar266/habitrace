@@ -6,6 +6,20 @@ interface Participant {
   joinedAt: string;
 }
 
+export enum Frequency {
+  DAILY ="DAILY",
+  WEEKLY="WEEKLY",
+  MONTHLY="MONTHLY",
+}
+
+export interface CreateRaceSchema {
+  name: string;
+  description: string | null;
+  startDate: string;
+  endDate: string;
+  frequency: Frequency;
+}
+
 export interface RaceSchema {
   id: string;
   raceSlug: string;

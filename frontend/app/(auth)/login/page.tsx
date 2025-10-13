@@ -20,7 +20,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import {loginformSchema} from "@/schemas/fromSchema";
+import { loginformSchema } from "@/schemas/fromSchema";
 import axios from "axios";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
@@ -44,9 +44,7 @@ export default function Page() {
 
   // ✅ Now registerHandler can be defined after useForm
   const loginHandler = async (data: FormData) => {
-    
     try {
-
       const response = await axios.post(
         `${BACKEND_URL}api/v1/auth/login`,
         data,
@@ -56,14 +54,13 @@ export default function Page() {
           },
         }
       );
-      
 
       toast.success("login successful!");
 
       // Handle success (redirect, show message, etc.)
       if (response.status === 200) {
         Cookies.set("token", response.data.data.token, {
-          expires: 7, // 7 days
+          expires: 2, // 2 days
           path: "/",
           secure: process.env.NODE_ENV === "production",
           sameSite: "strict",
@@ -107,7 +104,6 @@ export default function Page() {
                 onSubmit={form.handleSubmit(loginHandler)}
                 className="space-y-4"
               >
-              
                 <FormField
                   control={form.control}
                   name="username"
@@ -115,10 +111,7 @@ export default function Page() {
                     <FormItem>
                       <FormLabel>Username</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="anasthesia_01"
-                          {...field}
-                        />
+                        <Input placeholder="anasthesia_01" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -169,10 +162,7 @@ export default function Page() {
 
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
-              <Link
-                href="/register"
-                className="underline underline-offset-4"
-              >
+              <Link href="/register" className="underline underline-offset-4">
                 Register here
               </Link>
             </div>

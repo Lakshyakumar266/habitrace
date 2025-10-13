@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell,   Search,  } from "lucide-react";
+import { Bell, Moon, PlusSquare, Search, Sun } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   DropdownMenu,
@@ -11,19 +11,26 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import localFont from "next/font/local";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { decode, JwtPayload } from "jsonwebtoken";
-import { cn } from "@/lib/utils";
 
 interface userSchema extends JwtPayload {
   uuid: string;
   username: string;
 }
-export default function TopNav({ className }: { className?: string }) {
+const harmoneFont = localFont({
+  src: "../assets/fonts/harmone/harmone.ttf",
+  weight: "400",
+});
+
+export default function TopNav() {
   const router = useRouter();
+  const { setTheme } = useTheme();
   const [Logdin, setLogdin] = useState(false);
   const [User, setUser] = useState<userSchema>({} as userSchema);
   useEffect(() => {
@@ -65,21 +72,19 @@ export default function TopNav({ className }: { className?: string }) {
   };
 
   return (
-    
     <header
-      className={cn(
-              "sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60",
-              className,
-            )}
+      className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60"
       role="banner"
     >
       <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-4">
-        {/* <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3">
           <Link href="/hub" className="font-semibold tracking-tight">
-            
+            <span className={`text-pretty ${harmoneFont.className} text-2xl`}>
+              HabitRace
+            </span>
             <span className="sr-only">Go to homepage</span>
           </Link>
-        </div> */}
+        </div>
 
         <div className="hidden min-w-0 flex-1 items-center justify-center px-4 md:flex">
           <div className="flex w-full max-w-md items-center gap-2 rounded-md border bg-card px-3 py-2 text-sm">
@@ -96,10 +101,35 @@ export default function TopNav({ className }: { className?: string }) {
         </div>
 
         <div className="flex items-center gap-1">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+                <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+                <span className="sr-only">Toggle theme</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setTheme("light")}>
+                Light
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("dark")}>
+                Dark
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("system")}>
+                System
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {Logdin ? (
             <>
-              
+              <Button variant="ghost" size="icon" aria-label="Create">
+                <Link href="/race/create-race">
+                <PlusSquare className="h-5 w-5" />
+                </Link>
+              </Button>
+
               <Button
                 variant="ghost"
                 size="icon"
