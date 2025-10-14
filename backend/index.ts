@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import aiRouter from './routes/ai.route'
 import authRouter from './routes/auth'
 import usersRouter from './routes/users'
 import raceRouter from './routes/race-services'
@@ -22,6 +23,7 @@ app.use(cors({
 
 
 // routes
+app.use('/api/v1/llm', aiRouter)
 app.use('/api/v1/auth', authRouter)
 
 app.use('/api/v1/race', raceRouter)

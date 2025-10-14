@@ -84,7 +84,6 @@ router.route("/").get(async (req, res) => {
 
 router.route("/search").get(async (req, res) => {
     const query = decodeURIComponent(req.query.query as string) as string;
-    console.log(query);
     try {
         const races = await prisma.race.findMany({
             where: {
