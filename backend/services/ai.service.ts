@@ -12,7 +12,7 @@ const client = new OpenAI({
 });
 
 
-export async function OpenAIService(prompt: object) {
+export async function LLMTextResponseService(prompt: object) {
     const completion: any = await client.chat.completions.create({
         model: "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
         messages: [
