@@ -25,6 +25,7 @@ import cookies from "js-cookie";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Spinner } from "../ui/spinner";
+import { useCopyToClipboard } from "@/hooks/copyToClipboard-hook";
 
 export function RacePage({
   raceData,
@@ -39,18 +40,18 @@ export function RacePage({
   const race = raceData as RaceSchema;
   const leaderboard: LeaderboardEntry[] = leaderboardData;
 
-  const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedLink, copyToClipboard] = useCopyToClipboard()
   const [directInviteUser, setDirectInviteUser] = useState("");
   const raceLink = `${window.location.origin}/race/${race.raceSlug}`;
 
-  function handleCopyLink() {
-    if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(raceLink);
-      toast("Link copied to clipboard!");
-      setCopiedLink(true);
-      setTimeout(() => setCopiedLink(false), 2000);
+  async function handleCopyLink() {
+    // if (navigator?.clipboard?.writeText) {
+      const success = await copyToClipboard(raceLink)
+    toast(`${race.name} Link copied to clipboard!`)
+    if (success) {
+      console.log('Link copied successfully!',copiedLink)
     } else {
-      console.warn("Clipboard API not available or supported.");
+      console.log('Failed to copy link')
     }
   }
 
@@ -94,12 +95,13 @@ export function RacePage({
         }
       );
 
-      setJoining(false);
       if (response.status === 201) {
         toast("Race joined successfully!");
+        router.refresh()
       } else {
         toast("Can't join race now, try again later.");
       }
+      setJoining(false);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setJoining(false);

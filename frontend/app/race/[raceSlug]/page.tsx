@@ -24,7 +24,6 @@ export default async function Page({ params }: PageProps) {
         if (cookie) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const uuid = (jwt.decode(cookie) as any)?.uuid;
-          console.log(uuid);
           return await axios.get(`${BACKEND_URL}api/v1/race/${raceSlug}?uuid=${uuid}`);
         }
       }

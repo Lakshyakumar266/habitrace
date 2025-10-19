@@ -140,8 +140,6 @@ export default function Page() {
         toast.error(
           "Race not created!!! Please try again later or contact support."
         );
-      } else {
-        toast.error("Race not created!!! Please try again later.");
       }
     } catch (error) {
       console.log(error);

@@ -55,18 +55,18 @@ export default function Page() {
         }
       );
 
-      toast.success("login successful!");
-
       // Handle success (redirect, show message, etc.)
-      if (response.status === 200) {
+      if (response.data.success === true) {
         Cookies.set("token", response.data.data.token, {
           expires: 2, // 2 days
           path: "/",
           secure: process.env.NODE_ENV === "production",
           sameSite: "strict",
         });
-
+        toast.success("login successful!");
         router.push("/hub");
+      } else {
+        toast.error("wrong username or password");
       }
     } catch (error) {
       console.error("Registration error:", error);
