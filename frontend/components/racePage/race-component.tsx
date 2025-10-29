@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import {useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,19 +40,24 @@ export function RacePage({
   const race = raceData as RaceSchema;
   const leaderboard: LeaderboardEntry[] = leaderboardData;
 
-  const [copiedLink, copyToClipboard] = useCopyToClipboard()
+  const [copiedLink, copyToClipboard] = useCopyToClipboard();
+  const [copied, setCopied] = useState(false);
   const [directInviteUser, setDirectInviteUser] = useState("");
   const raceLink = `${window.location.origin}/race/${race.raceSlug}`;
 
   async function handleCopyLink() {
     // if (navigator?.clipboard?.writeText) {
-      const success = await copyToClipboard(raceLink)
-    toast(`${race.name} Link copied to clipboard!`)
+    const success = await copyToClipboard(raceLink);
+    toast(`${race.name} Link copied to clipboard!`);
     if (success) {
-      console.log('Link copied successfully!',copiedLink)
+      console.log("Link copied successfully!", copiedLink);
+      setCopied(true);
     } else {
-      console.log('Failed to copy link')
+      console.log("Failed to copy link");
     }
+    setTimeout(() => {
+      setCopied(false)
+    },2000);
   }
 
   async function handleSendDirectInvite() {
@@ -97,7 +102,7 @@ export function RacePage({
 
       if (response.status === 201) {
         toast("Race joined successfully!");
-        router.refresh()
+        router.refresh();
       } else {
         toast("Can't join race now, try again later.");
       }
@@ -159,8 +164,8 @@ export function RacePage({
                 </div>
               </div>
 
-              <h1 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-br from-orange-600 via-orange-500 to-amber-500 dark:from-orange-400 dark:via-orange-300 dark:to-amber-300 bg-clip-text text-transparent leading-tight">
-                {race.name.replace(/\b\w/g, char => char.toUpperCase())}
+              <h1 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-br from-orange-600 via-orange-500 to-amber-500 dark:from-orange-400 dark:via-orange-300 dark:to-amber-300 bg-clip-text text-transparent leading-tight wrap-anywhere">
+                {race.name.replace(/\b\w/g, (char) => char.toUpperCase())}
               </h1>
 
               <p className="text-xl text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -455,7 +460,7 @@ export function RacePage({
                         onClick={handleCopyLink}
                         className="bg-orange-600 hover:bg-orange-700 text-white"
                       >
-                        {copiedLink ? (
+                        {copied ? (
                           <>
                             <Check className="h-4 w-4 mr-1" />
                             Copied

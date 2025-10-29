@@ -57,7 +57,7 @@ const RaceCardHub: React.FC<RaceCardHubProps> = ({
       <CardHeader className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="flex flex-col gap-0.5">
-            <CardTitle className="flex items-center gap-1 text-lg text-gray-950 text-shadow-amber-300 dark:text-[#FAB12F] dark:text-shadow-yellow-600 ">
+            <CardTitle className="flex items-center gap-1 text-lg text-gray-950 text-shadow-amber-300 dark:text-[#FAB12F] dark:text-shadow-yellow-600 wrap-anywhere">
               {String(title).toUpperCase()}{" "}
               {/* <BadgeCheckIcon className="size-4 fill-sky-600 stroke-white dark:fill-sky-400" /> */}
             </CardTitle>
@@ -76,7 +76,7 @@ const RaceCardHub: React.FC<RaceCardHubProps> = ({
           </Button>
         </Link>
       </CardHeader>
-      <CardContent className="space-y-6 text-md dark:text-gray-200">
+      <CardContent className="space-y-6 text-md wrap-anywhere dark:text-gray-200">
         <p>
           {description ? (
             description.slice(0,250) + "..."

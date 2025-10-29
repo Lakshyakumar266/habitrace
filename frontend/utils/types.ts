@@ -50,3 +50,44 @@ export interface RaceCardHubProps {
   frequency: string;
   createdBy?: string;
 }
+
+
+interface ProfileRace {
+  id: string;
+  name: string;
+  date: string;
+  position: number;
+  time: string;
+}
+
+export interface ProfileBadge {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  unlockedDate: string;
+}
+
+
+export interface SocialLink {
+  platform: string;
+  url: string;
+  icon: React.ReactNode;
+}
+
+
+export interface UserProfile {
+  username: string;
+  fullName: string;
+  profileImage: string;
+  bannerImage: string;
+  email: string;
+  joinedDate: string;
+  currentStreak: number;
+  joinedRaces: ProfileRace[];
+  completedRaces: ProfileRace[];
+  badges: ProfileBadge[];
+  location: string;
+  socialLinks: SocialLink[];
+  isOwner: boolean;
+}
