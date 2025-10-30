@@ -40,7 +40,6 @@ export default async function Page({ params }: PageProps) {
       .data.data;
 
     const raceData: RaceSchema = (await raceResponse()).data.data;
-    console.log(raceData);
 
     return <RacePage raceData={raceData} leaderboardData={leaderboardData} />;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

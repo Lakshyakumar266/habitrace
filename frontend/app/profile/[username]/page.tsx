@@ -15,7 +15,9 @@ import {
   Github,
   Instagram,
   Linkedin,
+  MapPin,
 } from "lucide-react";
+import { formatIso8601ToFriendlyDate } from "@packfleet/datetime";
 import RacesList from "@/components/profile/races-list";
 import StreakCounter from "@/components/profile/streak-counter";
 import EditProfileModal from "@/components/profile/edit-profile-modal";
@@ -26,153 +28,64 @@ import Image from "next/image";
 import { SocialLink, UserProfile } from "@/utils/types";
 import axios from "axios";
 import { BACKEND_URL } from "@/config";
-
-// Mock data - replace with actual API call
-const mockUserData: UserProfile = {
-  username: "alex_runner",
-  fullName: "Alex Johnson",
-  profileImage:
-    "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-  bannerImage:
-    "https://i.pinimg.com/originals/5f/f4/58/5ff45883d083027e28142ce6fc48659d.gif",
-  email: "alex@example.com",
-  joinedDate: "January 2024",
-  location: "San Francisco, USA",
-  currentStreak: 12,
-  joinedRaces: [
-    {
-      id: "1",
-      name: "Spring Marathon 2025",
-      date: "March 15, 2025",
-      position: 3,
-      time: "2:45:32",
-    },
-    {
-      id: "2",
-      name: "City 10K Challenge",
-      date: "February 28, 2025",
-      position: 1,
-      time: "35:12",
-    },
-    {
-      id: "3",
-      name: "Winter Half Marathon",
-      date: "January 20, 2025",
-      position: 5,
-      time: "1:32:45",
-    },
-    {
-      id: "4",
-      name: "New Year 5K Sprint",
-      date: "January 1, 2025",
-      position: 2,
-      time: "18:23",
-    },
-  ],
-  completedRaces: [
-    {
-      id: "5",
-      name: "Spring Marathon 2025",
-      date: "March 15, 2025",
-      position: 3,
-      time: "2:45:32",
-    },
-    {
-      id: "6",
-      name: "City 10K Challenge",
-      date: "February 28, 2025",
-      position: 1,
-      time: "35:12",
-    },
-    {
-      id: "7",
-      name: "Winter Half Marathon",
-      date: "January 20, 2025",
-      position: 5,
-      time: "1:32:45",
-    },
-  ],
-  badges: [
-    {
-      id: "1",
-      name: "First Race",
-      icon: "🏁",
-      description: "Completed your first race",
-      unlockedDate: "January 1, 2025",
-    },
-    {
-      id: "2",
-      name: "Speed Demon",
-      icon: "⚡",
-      description: "Finished in top 3 positions 5 times",
-      unlockedDate: "February 15, 2025",
-    },
-    {
-      id: "3",
-      name: "Marathon Master",
-      icon: "🏆",
-      description: "Completed 3 marathons",
-      unlockedDate: "March 10, 2025",
-    },
-    {
-      id: "4",
-      name: "Consistency King",
-      icon: "🔥",
-      description: "Maintained a 10-day streak",
-      unlockedDate: "March 20, 2025",
-    },
-  ],
-  socialLinks: [
-    {
-      platform: "X",
-      url: "https://x.com/alexrunner",
-      icon: <X className="h-5 w-5" />,
-    },
-    {
-      platform: "Instagram",
-      url: "https://instagram.com/alexrunner",
-      icon: <Instagram className="h-5 w-5" />,
-    },
-    {
-      platform: "GitHub",
-      url: "https://github.com/alexrunner",
-      icon: <Github className="h-5 w-5" />,
-    },
-    {
-      platform: "LinkedIn",
-      url: "https://linkedin.com/in/alexrunner",
-      icon: <Linkedin className="h-5 w-5" />,
-    },
-  ],
-  isOwner: true,
-};
+import { capitalizeFirstLetter } from "@/lib/utils";
+import { useUser } from "@/context/useUser-context";
 
 export default function ProfilePage() {
   const Params = useParams();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEditSocialOpen, setIsEditSocialOpen] = useState(false);
-  const [userData, setUserData] = useState<UserProfile>(mockUserData);
+  const [userData, setUserData] = useState<UserProfile | null>(null);
+  const [isNotFound, setIsNotFound] = useState(false);
+
+  const { user, isLoading } = useUser();
 
   const username = Params?.username;
 
   useEffect(() => {
-    axios.get(`${BACKEND_URL}api/v1/user/${username}`).then((response) => {
-      console.log(response.data);
-    });
-  }, [username]);
+    if (!username) {
+      setIsNotFound(true);
+      return;
+    }
 
-  if (!username) return notFound();
+    axios
+      .get(`${BACKEND_URL}api/v1/user/${username}`)
+      .then((response) => {
+        const data = response.data.data;
+
+        if (user?.username === data.username) {
+          data.isOwner = true;
+        } else {
+          data.isOwner = false;
+        }
+
+        setUserData(data);
+      })
+      .catch((error) => {
+        if (error.response?.status === 404) {
+          setIsNotFound(true);
+        }
+      });
+  }, [user, username]);
+
+  if (isNotFound) {
+    notFound();
+  }
+  if (!username || !userData) return null;
 
   const handleSaveProfile = (updatedData: Partial<UserProfile>) => {
-    setUserData((prev) => ({ ...prev, ...updatedData }));
+    setUserData((prev) => ({ ...prev!, ...updatedData }));
     setIsEditModalOpen(false);
   };
 
   const handleSaveSocial = (updatedLinks: SocialLink[]) => {
-    setUserData((prev) => ({ ...prev, socialLinks: updatedLinks }));
+    setUserData((prev) => ({ ...prev!, socialLinks: updatedLinks }));
     setIsEditSocialOpen(false);
   };
+
+  console.log(" banner :", userData.bannerImage==='');
+  
 
   return (
     <main className="min-h-screen bg-background">
@@ -180,13 +93,13 @@ export default function ProfilePage() {
         {/* Banner */}
         <div className="relative h-48 w-full overflow-hidden bg-gray-200">
           <Image
-            src={userData.bannerImage}
+            src={userData.bannerImage==='' ? "/profile/banner/randome-2.jpeg" : userData.bannerImage}
             alt="banner"
             fill
-            className="object-cover object-center"
+            className="object-center"
           />
           {/* dark overlay to make foreground dominate */}
-          <div className="absolute inset-0 bg-black/60 pointer-events-none" />
+          <div className="absolute inset-0 bg-black/30 pointer-events-none" />
         </div>
 
         {/* Profile Section */}
@@ -203,13 +116,16 @@ export default function ProfilePage() {
               </Avatar>
               <div className="pb-2">
                 <h1 className="text-3xl font-bold text-foreground">
-                  {userData.fullName}
+                  {capitalizeFirstLetter(userData.fullName)}
                 </h1>
                 <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                  🇺🇸 {userData.location}
+                  <MapPin className="h-4 w-4" />
+                  {userData.location.toUpperCase()}
                 </p>
                 <p className="text-sm text-foreground mt-2">
-                  <span className="font-semibold text-base">@{userData.username}</span>
+                  <span className="font-semibold text-base">
+                    @{userData.username}
+                  </span>
                   <span className="mx-2 text-muted-foreground">•</span>
                   <span className=" text-orange-500 font-mono">
                     {userData.currentStreak >= 30
@@ -335,7 +251,12 @@ export default function ProfilePage() {
                   <p className="text-muted-foreground text-xs uppercase font-semibold">
                     Member Since
                   </p>
-                  <p className="text-foreground mt-1">{userData.joinedDate}</p>
+                  <p className="text-foreground mt-1">
+                    {formatIso8601ToFriendlyDate(
+                      userData.joinedDate,
+                      "America/Chicago"
+                    )}
+                  </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs uppercase font-semibold">

@@ -14,11 +14,11 @@ import {
 import localFont from "next/font/local";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { decode, JwtPayload } from "jsonwebtoken";
 import ThemeSwitch from "./themeswitch";
+import { useUser } from "@/context/useUser-context";
 
 interface userSchema extends JwtPayload {
   uuid: string;
@@ -31,22 +31,16 @@ const harmoneFont = localFont({
 
 export default function TopNav() {
   const router = useRouter();
-  const { setTheme } = useTheme();
   const [Logdin, setLogdin] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [User, setUser] = useState<userSchema>({} as userSchema);
+  const { user, isLoading } = useUser();
   useEffect(() => {
-    const user = Cookies.get("token");
-    const decodedToken = decode(String(user));
-    let decoded;
-    if (typeof decodedToken === "string") {
-      decoded = JSON.parse(decodedToken);
-    } else if (decodedToken && typeof decodedToken === "object") {
-      decoded = decodedToken;
-    }
-    setUser(decoded);
+    if (isLoading) return;
+
+    setUser(user as userSchema);
     setLogdin(!!user);
-  }, []);
+  }, [isLoading, user]);
 
   const handleLogout = async () => {
     try {
@@ -121,7 +115,6 @@ export default function TopNav() {
         </div>
 
         <div className="flex items-center gap-1">
-
           <ThemeSwitch />
 
           {Logdin ? (

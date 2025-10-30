@@ -16,7 +16,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Habit Race - Create your own habit by racing",
-  description: "habitrace is an open-source habit tracking app that allows you to create your own habits and track your progress while racing against other users.",
+  description:
+    "habitrace is an open-source habit tracking app that allows you to create your own habits and track your progress while racing against other users.",
 };
 
 export default function RootLayout({

@@ -123,12 +123,13 @@ export default function Page() {
       frequency: frequency as Frequency,
     };
     try {
-      const request = await axios.post(`${BACKEND_URL}api/v1/race/`, formData, {
+      const request = await axios.post(`${BACKEND_URL}api/v1/race`, formData, {
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + Cookies.get("token"),
         },
       });
+
       const response: RaceSchema = request.data?.data;
       if (request.status === 201) {
         toast.success(
@@ -142,7 +143,7 @@ export default function Page() {
         );
       }
     } catch (error) {
-      console.log(error);
+      console.error("Got Error - ", error);
       toast.error("Race not created!!! Please try again later.");
     } finally {
       setSubmitting(false);

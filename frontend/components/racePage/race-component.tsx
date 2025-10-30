@@ -1,6 +1,6 @@
 "use client";
 
-import {useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -48,16 +48,15 @@ export function RacePage({
   async function handleCopyLink() {
     // if (navigator?.clipboard?.writeText) {
     const success = await copyToClipboard(raceLink);
-    toast(`${race.name} Link copied to clipboard!`);
     if (success) {
-      console.log("Link copied successfully!", copiedLink);
       setCopied(true);
+      toast(`${race.name} Link copied to clipboard!`);
     } else {
-      console.log("Failed to copy link");
+      toast(`copy again!`);
     }
     setTimeout(() => {
-      setCopied(false)
-    },2000);
+      setCopied(false);
+    }, 2000);
   }
 
   async function handleSendDirectInvite() {
@@ -74,9 +73,13 @@ export function RacePage({
           },
         }
       );
-      console.log(response.data);
 
-      toast(`Invitation sent to ${directInviteUser.trim()}`);
+      if (response.status === 200) {
+        toast(`Invitation sent to ${directInviteUser.trim()}`);
+      } else {
+        toast("Can't send invitation now, try again later.");
+      }
+
       setDirectInviteUser("");
     }
   }
