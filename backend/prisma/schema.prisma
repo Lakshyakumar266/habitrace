@@ -14,46 +14,65 @@ model RefreshToken {
   expiresAt DateTime
   revoked   Boolean  @default(false)
   createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+model SocialLink {
+  id       String @id @default(uuid())
+  platform String
+  url      String
+  userId   String
+  user     User   @relation("SocialLink", fields: [userId], references: [id])
+
+  @@map("social_links")
+}
+
+model ProfileBadge {
+  id         String   @id @default(uuid())
+  badgeName  String
+  badgeDesc  String
+  badgeIcon  String
+  unlockedAt DateTime @default(now())
+  userId     String
+  user       User     @relation("Badges", fields: [userId], references: [id])
+
+  @@map("badges")
 }
 
 model User {
-  id           String   @id @default(uuid())
-  username     String   @unique @db.VarChar(90)
-  fullName     String   @db.VarChar(100)
-  email        String   @unique @db.VarChar(100)
-  passwordHash String
-  createdAt    DateTime @default(now())
-  pic          String
-
+  id             String          @id @default(uuid())
+  username       String          @unique @db.VarChar(90)
+  fullName       String          @db.VarChar(100)
+  email          String          @unique @db.VarChar(100)
+  passwordHash   String
+  joinedAt       DateTime        @default(now())
+  streak         Int             @default(0)
+  location       String?
+  pic            String
+  banner         String?
   refreshTokens  RefreshToken[]
+  Badges         ProfileBadge[]  @relation("Badges")
   participations Participation[] @relation("joinedBy")
   racesCreated   Race[]          @relation("RaceCreatedBy")
+  socialLinks    SocialLink[]    @relation("SocialLink")
 
   @@map("users")
 }
 
-enum Racefrequency {
-  DAILY
-  WEEKLY
-  MONTHLY
-}
-
 model Race {
-  id          String   @id @default(uuid())
-  raceSlug    String   @unique @db.VarChar(300)
-  name        String
-  description String?
-  startDate   DateTime
-  endDate     DateTime
-  frequency   Racefrequency @default(DAILY)
-  createdAt   DateTime @default(now())
-  createdById String
-
-  createdBy    User            @relation("RaceCreatedBy", fields: [createdById], references: [id])
+  id           String          @id @default(uuid())
+  raceSlug     String          @unique @db.VarChar(300)
+  name         String
+  description  String?
+  startDate    DateTime
+  endDate      DateTime
+  completed    Boolean         @default(false)
+  frequency    Racefrequency   @default(DAILY)
+  createdAt    DateTime        @default(now())
+  createdById  String
   participants Participation[] @relation("joinedRace")
+  createdBy    User            @relation("RaceCreatedBy", fields: [createdById], references: [id])
 
   @@map("races")
 }
@@ -64,22 +83,27 @@ model Participation {
   raceId   String
   joined   Boolean   @default(true)
   joinedAt DateTime  @default(now())
-  user     User      @relation("joinedBy", fields: [userId], references: [id])
-  race     Race      @relation("joinedRace", fields: [raceId], references: [id])
   checkins Checkin[]
+  race     Race      @relation("joinedRace", fields: [raceId], references: [id])
+  user     User      @relation("joinedBy", fields: [userId], references: [id])
 
-  @@unique([userId, raceId]) // one user joins a race only once
+  @@unique([userId, raceId])
   @@map("participants")
 }
 
 model Checkin {
-  id              String   @id @default(uuid())
+  id              String        @id @default(uuid())
   participationId String
-  checkinDate     DateTime // chosen by user for that race
-  createdAt       DateTime @default(now())
+  checkinDate     DateTime
+  createdAt       DateTime      @default(now())
+  participation   Participation @relation(fields: [participationId], references: [id])
 
-  participation Participation @relation(fields: [participationId], references: [id])
-
-  @@unique([participationId, checkinDate]) // no duplicate check-ins for same day
+  @@unique([participationId, checkinDate])
   @@map("checkins")
+}
+
+enum Racefrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
 }

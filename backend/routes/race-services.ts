@@ -10,7 +10,17 @@ const router = Router()
 router.route("/").post(authMiddleware, createRaceMiddleware, async (req, res) => {
     const { name: raceName, description: raceDescription, startDate: raceStartingDate, endDate: raceEndingDate, frequency: raceFrequency } = req.body;
     const raceSlug = String(raceName + `_${raceFrequency}`).replaceAll(' ', '_')
-
+    console.log(req.body);
+    const user = await prisma.user.findUnique({
+        where: { id: res.locals.user.uuid }
+    });
+    if (!user) {
+        return res.status(404).send({
+            message: "User does not exist",
+            success: false,
+            data: {}
+        })
+    }
     try {
         const createRace = await prisma.race.create({
             data: {
@@ -32,6 +42,8 @@ router.route("/").post(authMiddleware, createRaceMiddleware, async (req, res) =>
         })
 
     } catch (error) {
+        console.log(error);
+
         return res.status(500).send({
             message: "server error",
             success: false,

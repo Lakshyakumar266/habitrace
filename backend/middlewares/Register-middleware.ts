@@ -38,6 +38,8 @@ export const registerMiddleware = async (req: Request, res: Response, next: Next
         next()
 
     } catch (error) {
+        console.log(error);
+        
         return res.status(401).send({
             message: "Server Error",
             success: false,

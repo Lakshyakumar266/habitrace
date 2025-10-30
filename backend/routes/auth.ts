@@ -12,7 +12,7 @@ const router = Router()
 
 router.route("/register").post(registerMiddleware, async (req, res) => {
 
-    const { username, fullName, fullname, email, password, pic } = req.body;
+    const { username, fullName, fullname, email, password, pic,banner,location } = req.body;
 
     const passwordHash = await hash(password, 10);
     try {
@@ -21,7 +21,9 @@ router.route("/register").post(registerMiddleware, async (req, res) => {
                 username: username,
                 fullName: fullName ?? fullname,
                 pic: (pic ? pic : "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"),
+                banner: (banner ? pic : "https://i.pinimg.com/236x/d3/36/39/d33639a83730a644e874fcd9e82925c3.jpg"),
                 email: email,
+                location: (location? location : "Earth"),
                 passwordHash: passwordHash,
             }
         });
@@ -45,6 +47,7 @@ router.route("/register").post(registerMiddleware, async (req, res) => {
             data: { token: token }
         })
     } catch (error) {
+        
         return res.status(401).send({
             message: "user created failed",
             success: false,

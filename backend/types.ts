@@ -6,6 +6,10 @@ export const CreateUser = z.object({
     email: z.email(),
     fullname: z.string(),
     password: z.string(),
+    pic: z.string().optional(),
+    banner: z.string().optional(),
+    locatin: z.string().optional(),
+
 })
 
 export interface UserSchema {
@@ -27,3 +31,38 @@ export interface Leaderboard {
     streak:number,
 }
 
+export interface ProfileRace {
+  id: string;
+  name: string;
+  date: string;
+  position: number;
+}
+
+export interface ProfileBadge {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  unlockedDate: string;
+}
+
+export interface SocialLink {
+  platform: string;
+  url: string;
+  icon: React.ReactNode;
+}
+
+export interface UserProfile {
+  username: string;
+  fullName: string;
+  profileImage: string;
+  bannerImage: string;
+  email: string;
+  joinedDate: Date;
+  currentStreak: number;
+  joinedRaces: ProfileRace[];
+  completedRaces: ProfileRace[];
+  badges: ProfileBadge[];
+  location?: string;
+  socialLinks: SocialLink[];
+}
