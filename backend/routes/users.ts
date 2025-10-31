@@ -3,8 +3,25 @@ import { authMiddleware } from "../middlewares/auth-middleware"
 import prisma from "../utils/prisma.utility"
 import type { ProfileRace, UserProfile } from "../types"
 import ImageKit from "@imagekit/nodejs"
+import ApiResponse from "../utils/apiResponse"
 
 const router = Router()
+
+router.route("/username/check").get(async (req, res) => {
+    try {
+        const username = req.query.username as string;
+        const getUser = await prisma.user.findFirst({
+            where: { username }
+        })
+
+        return res.status(200).send(new ApiResponse(200, {
+            isAvailable: getUser ? false : true
+        }))
+
+    } catch (error) {
+        return res.status(500).send(new ApiResponse(500, null, "faild to check username"))
+    }
+})
 
 router.route("/:username").get(async (req, res) => {
     const username = req.params.username;
@@ -117,7 +134,7 @@ router.route("/upload-pic/signature").get(authMiddleware, async (req, res) => {
         const { token, expire, signature } = client.helper.getAuthenticationParameters();
         return res.status(200).send({
             statusCode: 200,
-            data: { token, expire, signature, publickey: process.env.IMAGEKIT_PUBLIC_KEY },
+            data: { token, expire, signature, publicKey: process.env.IMAGEKIT_PUBLIC_KEY },
             success: true,
             message: "successfully got upload signature"
         });
@@ -134,7 +151,8 @@ router.route("/upload-pic/signature").get(authMiddleware, async (req, res) => {
 
 router.route("/:username/update").patch(authMiddleware, async (req, res) => {
     const updateData = req.body;
-
+    console.log(updateData);
+    
     const URLusername = req.params.username
     const UserUsername = res.locals.user.username;
 
@@ -165,6 +183,8 @@ router.route("/:username/update").patch(authMiddleware, async (req, res) => {
     }
     )
 })
+
+
 
 
 // TODO: Create Posts routes 
