@@ -17,14 +17,17 @@ import SocialLinks from "@/components/profile/social-links";
 import EditSocialModal from "@/components/profile/edit-social-modal";
 import Image from "next/image";
 import { SocialLink, UserProfile } from "@/utils/types";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { BACKEND_URL } from "@/config";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import { useUser } from "@/context/useUser-context";
 import { toast } from "sonner";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const Params = useParams();
+  const router = useRouter();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEditSocialOpen, setIsEditSocialOpen] = useState(false);
@@ -66,14 +69,80 @@ export default function ProfilePage() {
   }
   if (!username || !userData) return null;
 
-  const handleSaveProfile = (updatedData: Partial<UserProfile>) => {
+  const handleSaveProfile = async (updatedData: Partial<UserProfile>) => {
+
+    let isUsernameChange = false;
+
     setUserData((prev) => ({ ...prev!, ...updatedData }));
-    
+    const { username, fullName, bannerUrl, profilePicUrl } = updatedData;
+
+    const profileUpdateData: {
+      pic?: string;
+      banner?: string;
+      fullName?: string;
+      username?: string;
+    } = {};
+
+    // Checking and updateing only changed fields
+    if (profilePicUrl !== "") {
+      if (userData.profilePicUrl !== userData.profileImage) {
+        profileUpdateData.pic = profilePicUrl;
+      }
+    }
+    if (bannerUrl !== "") {
+      if (bannerUrl !== userData.bannerImage) {
+        profileUpdateData.banner = bannerUrl;
+      }
+    }
+    if (fullName !== userData.fullName) {
+      profileUpdateData.fullName = fullName;
+    }
+    if (username !== userData.username) {
+      isUsernameChange = true;
+
+      profileUpdateData.username = username;
+    }
+
+    try {
+      const response = await axios.patch(
+        `${BACKEND_URL}api/v1/user/${user?.username}/update`,
+        profileUpdateData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Cookies.get("token")}`,
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      );
+      if (response.status === 200 && response.data.success) {
+        toast.success("Profile updated successfully");
+
+        if (isUsernameChange) {
+          window.location.href = `/api/auth/logout`;
+        }
+      } else {
+        toast.success("Failed to update profile! Try again later.");
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          throw new Error("Unauthorized");
+        }
+      } else {
+        console.log(error);
+        throw new Error("An unexpected error occurred");
+      }
+      toast.error("Failed to update profile! Try again later.");
+      console.error("Error updating profile", error);
+    }
+
     setIsEditModalOpen(false);
   };
 
   const handleSaveSocial = (updatedLinks: SocialLink[]) => {
     setUserData((prev) => ({ ...prev!, socialLinks: updatedLinks }));
+
     setIsEditSocialOpen(false);
   };
   const handleShareSocial = async () => {

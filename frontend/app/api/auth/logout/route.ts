@@ -1,35 +1,24 @@
-// app/api/auth/logout/route.ts
+// import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
     try {
         const { redirectTo = '/login' } = await request.json().catch(() => ({}))
-
         // Clear auth cookies
         const response = NextResponse.json(
-            { 
+            {
                 success: true,
                 message: 'Logged out successfully',
-                redirectTo 
+                redirectTo
             },
             { status: 200 }
         )
-
-        response.cookies.set({
-            name: 'token',
-            value: '',
-            expires: new Date(0),
-            path: '/',
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax'
-        })
-
+        response.cookies.delete('token')
+        
         return response
-
     } catch (error) {
         return NextResponse.json(
-            { success: false, message: 'Logout failed',error:error },
+            { success: false, message: 'Logout failed', error: error },
             { status: 500 }
         )
     }

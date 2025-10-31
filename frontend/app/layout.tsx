@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import Providers from "./providers";
+import NextTopLoader from "nextjs-toploader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
       >
         <Providers>
           <Toaster position="top-center" />
+          <NextTopLoader />
           {/* <main className="bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/grid-2.png)' }}> */}
           {children}
           {/* </main> */}

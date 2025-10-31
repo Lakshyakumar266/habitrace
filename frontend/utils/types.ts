@@ -81,6 +81,8 @@ export interface UserProfile {
   fullName: string;
   profileImage: string;
   bannerImage: string;
+  bannerUrl: string;
+  profilePicUrl: string;
   email: string;
   joinedDate: string;
   currentStreak: number;
