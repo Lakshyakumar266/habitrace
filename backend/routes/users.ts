@@ -2,6 +2,7 @@ import { Router } from "express"
 import { authMiddleware } from "../middlewares/auth-middleware"
 import prisma from "../utils/prisma.utility"
 import type { ProfileRace, UserProfile } from "../types"
+import ImageKit from "@imagekit/nodejs"
 
 const router = Router()
 
@@ -74,7 +75,7 @@ router.route("/:username").get(async (req, res) => {
         id: participation.race.id,
         name: participation.race.name,
         date: participation.race.endDate.toISOString(), // or format as needed
-        position:0
+        position: 0
     }));
 
     const joinedRaces: ProfileRace[] = getJoinedRaces.map(participation => ({
@@ -106,6 +107,29 @@ router.route("/:username").get(async (req, res) => {
         success: true,
         message: 'succesfully got user'
     })
+})
+
+router.route("/upload-pic/signature").get(authMiddleware, async (req, res) => {
+    try {
+        const client = new ImageKit({
+            privateKey: process.env.IMAGEKIT_PRIVATE_KEY as string,
+        });
+        const { token, expire, signature } = client.helper.getAuthenticationParameters();
+        return res.status(200).send({
+            statusCode: 200,
+            data: { token, expire, signature, publickey: process.env.IMAGEKIT_PUBLIC_KEY },
+            success: true,
+            message: "successfully got upload signature"
+        });
+    } catch (error) {
+        return res.status(500).send({
+            statusCode: 500,
+            success: false,
+            message: "faild to generate imagekit signature"
+        });
+
+    }
+
 })
 
 router.route("/:username/update").patch(authMiddleware, async (req, res) => {

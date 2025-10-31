@@ -7,16 +7,7 @@ import { Button } from "@/components/ui/button";
 import { notFound, useParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Edit2,
-  MessageCircle,
-  Share2,
-  X,
-  Github,
-  Instagram,
-  Linkedin,
-  MapPin,
-} from "lucide-react";
+import { Edit2, MessageCircle, Share2, MapPin } from "lucide-react";
 import { formatIso8601ToFriendlyDate } from "@packfleet/datetime";
 import RacesList from "@/components/profile/races-list";
 import StreakCounter from "@/components/profile/streak-counter";
@@ -30,6 +21,7 @@ import axios from "axios";
 import { BACKEND_URL } from "@/config";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import { useUser } from "@/context/useUser-context";
+import { toast } from "sonner";
 
 export default function ProfilePage() {
   const Params = useParams();
@@ -39,7 +31,7 @@ export default function ProfilePage() {
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [isNotFound, setIsNotFound] = useState(false);
 
-  const { user, isLoading } = useUser();
+  const { user } = useUser();
 
   const username = Params?.username;
 
@@ -76,6 +68,7 @@ export default function ProfilePage() {
 
   const handleSaveProfile = (updatedData: Partial<UserProfile>) => {
     setUserData((prev) => ({ ...prev!, ...updatedData }));
+    
     setIsEditModalOpen(false);
   };
 
@@ -83,9 +76,52 @@ export default function ProfilePage() {
     setUserData((prev) => ({ ...prev!, socialLinks: updatedLinks }));
     setIsEditSocialOpen(false);
   };
+  const handleShareSocial = async () => {
+    const profileUrl = `${window.location.origin}/profile/${userData.username}`;
 
-  console.log(" banner :", userData.bannerImage==='');
-  
+    // Create share text based on user's stats
+    const achievements =
+      userData.currentStreak >= 30
+        ? "Elite Runner"
+        : userData.currentStreak >= 15
+        ? "Advanced Runner"
+        : userData.currentStreak >= 7
+        ? "Intermediate Runner"
+        : userData.currentStreak >= 1
+        ? "Biggner Runner"
+        : "Noob Runner";
+
+    const shareText =
+      `🏃 Check out ${userData.fullName}'s running journey!\n\n` +
+      `🔥 ${userData.currentStreak} day streak\n` +
+      `🏅 ${achievements}\n` +
+      `🎯 ${userData.completedRaces.length} races completed\n\n` +
+      `Join them on Habitrace:`;
+
+    try {
+      if (navigator.share) {
+        const shareData = {
+          title: `${userData.fullName}'s Profile on Habitrace`,
+          text: shareText,
+          url: profileUrl,
+        };
+        await navigator.share(shareData);
+        toast.success("Shared successfully!");
+      } else {
+        // For X's web intent
+        const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          shareText
+        )}&url=${encodeURIComponent(profileUrl)}`;
+        window.open(twitterShareUrl, "_blank");
+        toast.success("Opening X to share...");
+      }
+    } catch (error) {
+      // Only show error if it's not a user cancellation
+      if (error instanceof Error && error.name !== "AbortError") {
+        toast.error("Failed to share profile");
+      }
+    }
+  };
 
   return (
     <main className="min-h-screen bg-background">
@@ -93,7 +129,11 @@ export default function ProfilePage() {
         {/* Banner */}
         <div className="relative h-48 w-full overflow-hidden bg-gray-200">
           <Image
-            src={userData.bannerImage==='' ? "/profile/banner/randome-2.jpeg" : userData.bannerImage}
+            src={
+              userData.bannerImage === ""
+                ? "/profile/banner/randome-2.jpeg"
+                : userData.bannerImage
+            }
             alt="banner"
             fill
             className="object-center"
@@ -134,7 +174,9 @@ export default function ProfilePage() {
                       ? "Advanced Runner"
                       : userData.currentStreak >= 7
                       ? "Intermediate Runner"
-                      : "Beginner Runner"}
+                      : userData.currentStreak >= 1
+                      ? "Biggner Runner"
+                      : "Noob Runner"}
                   </span>
                 </p>
               </div>
@@ -146,7 +188,7 @@ export default function ProfilePage() {
                 <MessageCircle className="h-4 w-4" />
                 Message
               </Button>
-              <Button className="gap-2">
+              <Button className="gap-2" onClick={handleShareSocial}>
                 <Share2 className="h-4 w-4" />
                 Share Profile
               </Button>
