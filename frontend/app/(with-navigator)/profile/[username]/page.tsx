@@ -17,17 +17,16 @@ import SocialLinks from "@/components/profile/social-links";
 import EditSocialModal from "@/components/profile/edit-social-modal";
 import Image from "next/image";
 import { SocialLink, UserProfile } from "@/utils/types";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { BACKEND_URL } from "@/config";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import { useUser } from "@/context/useUser-context";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
+
 
 export default function ProfilePage() {
   const Params = useParams();
-  const router = useRouter();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEditSocialOpen, setIsEditSocialOpen] = useState(false);
@@ -198,6 +197,7 @@ export default function ProfilePage() {
         {/* Banner */}
         <div className="relative h-48 w-full overflow-hidden bg-gray-200">
           <Image
+          priority
             src={
               userData.bannerImage === ""
                 ? "/profile/banner/randome-2.jpeg"

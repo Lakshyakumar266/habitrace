@@ -3,7 +3,7 @@
 import RaceCardHub from "@/components/race-cardComponent";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { BACKEND_URL } from "../../config";
+import { BACKEND_URL } from "../../../config";
 
 type Card = {
   id: number;

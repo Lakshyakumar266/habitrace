@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/hub/page.tsx", "components/share-dialog.tsa", "components/Hyperspeed.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/(with-navigator)/hub/page.tsx", "components/share-dialog.tsa", "components/Hyperspeed.jsx"],
   "exclude": ["node_modules"]
 }

@@ -9,6 +9,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
+  // const sidebar = useStore(useSidebar, (x) => x);
+  //   if (!sidebar) return null;
+    // const { getOpenState, settings } = sidebar;
+    // settings.isHoverOpen = true;
   return (
     <>
       <Suspense
@@ -19,9 +24,12 @@ export default function RootLayout({
         }
       >
           <TopNav />
+
         <div className="flex">
           <div className="mx-auto flex w-full max-w-screen-2xl">
-            <div className="flex-1">{children}</div>
+            <div className="flex-1">
+              {children}
+              </div>
           </div>
         </div>
       </Suspense>

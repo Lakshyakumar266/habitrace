@@ -64,7 +64,7 @@ export default function Page() {
           sameSite: "strict",
         });
         toast.success("login successful!");
-        router.push("/hub");
+        window.location.href = "/hub";
       } else {
         toast.error("wrong username or password");
       }
