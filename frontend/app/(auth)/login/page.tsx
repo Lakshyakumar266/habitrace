@@ -24,11 +24,9 @@ import { loginformSchema } from "@/schemas/fromSchema";
 import axios from "axios";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
 import { BACKEND_URL } from "@/config";
 
 export default function Page() {
-  const router = useRouter();
 
   const formType = "login";
   type FormData = z.infer<typeof loginformSchema>;
