@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react"; // added useMemo
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Spinner } from "../ui/spinner";
 import { useCopyToClipboard } from "@/hooks/copyToClipboard-hook";
+import Link from "next/link"; // ensure Link is imported
 
 export function RacePage({
   raceData,
@@ -38,15 +39,20 @@ export function RacePage({
   const [joining, setJoining] = useState(false);
 
   const race = raceData as RaceSchema;
-  const leaderboard: LeaderboardEntry[] = leaderboardData;
+  const leaderboard = leaderboardData as LeaderboardEntry[];
+
+  // Sort leaderboard by streak descending (highest first)
+  const sortedLeaderboard = useMemo(() => {
+    return [...leaderboard].sort((a, b) => b.streak - a.streak);
+  }, [leaderboard]);
 
   const [copiedLink, copyToClipboard] = useCopyToClipboard();
   const [copied, setCopied] = useState(false);
   const [directInviteUser, setDirectInviteUser] = useState("");
   const raceLink = `${window.location.origin}/race/${race.raceSlug}`;
 
+  // ... (rest of the event handlers unchanged) ...
   async function handleCopyLink() {
-    // if (navigator?.clipboard?.writeText) {
     const success = await copyToClipboard(raceLink);
     if (success) {
       setCopied(true);
@@ -71,7 +77,7 @@ export function RacePage({
             withCredentials: true,
             "Access-Control-Allow-Origin": "*",
           },
-        }
+        },
       );
 
       if (response.status === 200) {
@@ -100,7 +106,7 @@ export function RacePage({
             Authorization: `Bearer ${cookies.get("token")}`,
             withCredentials: true,
           },
-        }
+        },
       );
 
       if (response.status === 201) {
@@ -132,7 +138,7 @@ export function RacePage({
   const isEnded = endDate < now;
 
   const durationDays = Math.ceil(
-    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
   );
 
   return (
@@ -140,6 +146,7 @@ export function RacePage({
       <div className="container mx-auto px-4 py-8 md:py-16 max-w-6xl">
         <div className="grid lg:grid-cols-5 gap-8 items-start">
           <div className="lg:col-span-3 space-y-6">
+            {/* ... (race header and details unchanged) ... */}
             <div className="space-y-4">
               <div className="flex items-center gap-3 flex-wrap">
                 {isUpcoming && (
@@ -163,7 +170,15 @@ export function RacePage({
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <User className="h-4 w-4" />
-                  <span>by @{race.createdBy.username}</span>
+                  <span>
+                    by @
+                    <Link
+                      href={`/profile/${race.createdBy.username}`}
+                      className="hover:underline"
+                    >
+                      {race.createdBy.username}
+                    </Link>
+                  </span>
                 </div>
               </div>
 
@@ -177,6 +192,7 @@ export function RacePage({
             </div>
 
             <div className="grid grid-cols-3 gap-4 pt-4">
+              {/* ... date/duration/frequency cards unchanged ... */}
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
                   <Calendar className="h-4 w-4" />
@@ -273,7 +289,7 @@ export function RacePage({
                           Rank
                         </th>
                         <th className="text-left py-3 px-2 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                          Name
+                          Racer
                         </th>
                         <th className="text-right py-3 px-2 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
                           Streak
@@ -281,7 +297,7 @@ export function RacePage({
                       </tr>
                     </thead>
                     <tbody>
-                      {leaderboard.length === 0 ? (
+                      {sortedLeaderboard.length === 0 ? ( // use sortedLeaderboard for empty check
                         <tr>
                           <td colSpan={3} className="py-12 text-center">
                             <div className="flex flex-col items-center gap-3">
@@ -296,38 +312,46 @@ export function RacePage({
                           </td>
                         </tr>
                       ) : (
-                        leaderboard.map((entry) => (
-                          <tr
-                            key={entry.position}
-                            className="border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
-                          >
-                            <td className="py-3 px-2">
-                              <div className="flex items-center gap-2">
-                                {entry.position === 1 && (
-                                  <span className="text-lg">🥇</span>
-                                )}
-                                {entry.position === 2 && (
-                                  <span className="text-lg">🥈</span>
-                                )}
-                                {entry.position === 3 && (
-                                  <span className="text-lg">🥉</span>
-                                )}
-                                <span className="font-semibold text-slate-900 dark:text-slate-100">
-                                  #{entry.position}
+                        sortedLeaderboard.map((entry, index) => {
+                          const rank = index + 1; // new rank based on sorted order
+                          return (
+                            <tr
+                              key={`${entry.position || entry.name}-${entry.streak}`} // use a unique key
+                              className="border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                            >
+                              <td className="py-3 px-2">
+                                <div className="flex items-center gap-2">
+                                  {rank === 1 && (
+                                    <span className="text-lg">🥇</span>
+                                  )}
+                                  {rank === 2 && (
+                                    <span className="text-lg">🥈</span>
+                                  )}
+                                  {rank === 3 && (
+                                    <span className="text-lg">🥉</span>
+                                  )}
+                                  <span className="font-semibold text-slate-900 dark:text-slate-100">
+                                    #{rank}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="py-3 px-2">
+                                <Link
+                                  href={`/profile/${entry.name}`}
+                                  className="text-slate-700 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 hover:underline"
+                                >
+                                  {entry.name}
+                                </Link>
+                              </td>
+                              <td className="py-3 px-2 text-right">
+                                <span className="inline-flex items-center gap-1 font-semibold text-orange-600 dark:text-orange-400">
+                                  <Zap className="h-4 w-4" />
+                                  {entry.streak}
                                 </span>
-                              </div>
-                            </td>
-                            <td className="py-3 px-2 text-slate-700 dark:text-slate-300">
-                              {entry.name}
-                            </td>
-                            <td className="py-3 px-2 text-right">
-                              <span className="inline-flex items-center gap-1 font-semibold text-orange-600 dark:text-orange-400">
-                                <Zap className="h-4 w-4" />
-                                {entry.streak}
-                              </span>
-                            </td>
-                          </tr>
-                        ))
+                              </td>
+                            </tr>
+                          );
+                        })
                       )}
                     </tbody>
                   </table>
@@ -336,8 +360,10 @@ export function RacePage({
             </Card>
           </div>
 
+          {/* ... right sidebar (join card, invite card) unchanged ... */}
           <div className="lg:col-span-2 lg:sticky lg:top-8">
             <Card className="border-2 border-orange-500 dark:border-orange-400 shadow-xl overflow-hidden">
+              {/* ... content unchanged ... */}
               <div className="bg-gradient-to-br from-orange-600 via-orange-500 to-amber-500 dark:from-orange-500 dark:via-orange-400 dark:to-amber-400 p-8 text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/20 dark:bg-white/30 mb-4">
                   <Trophy className="h-8 w-8 text-white" />

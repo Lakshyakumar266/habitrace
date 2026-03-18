@@ -21,6 +21,7 @@
         "zod": "^4.1.9",
       },
       "devDependencies": {
+        "@faker-js/faker": "^10.3.0",
         "@types/bun": "latest",
         "prisma": "^6.16.2",
       },
@@ -30,6 +31,8 @@
     },
   },
   "packages": {
+    "@faker-js/faker": ["@faker-js/faker@10.3.0", "", {}, "sha512-It0Sne6P3szg7JIi6CgKbvTZoMjxBZhcv91ZrqrNuaZQfB5WoqYYbzCUOq89YR+VY8juY9M1vDWmDDa2TzfXCw=="],
+
     "@imagekit/nodejs": ["@imagekit/nodejs@7.1.1", "", { "dependencies": { "standardwebhooks": "^1.0.0" } }, "sha512-9ll3r04d4lkpVpO9yzU40kmT6UH0+d8UcYYYesnBML8lTI0ghTnNfwxIPuC8l2vDwVxIPZ8eQr2JlPSQHvRQbw=="],
 
     "@prisma/client": ["@prisma/client@6.16.2", "", { "peerDependencies": { "prisma": "*", "typescript": ">=5.1.0" }, "optionalPeers": ["prisma", "typescript"] }, "sha512-E00PxBcalMfYO/TWnXobBVUai6eW/g5OsifWQsQDzJYm7yaY+IRLo7ZLsaefi0QkTpxfuhFcQ/w180i6kX3iJw=="],

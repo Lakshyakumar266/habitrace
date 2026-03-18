@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Moon, PlusSquare, Search, Sun } from "lucide-react";
+import { Bell, PlusSquare, Search } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   DropdownMenu,
@@ -15,8 +15,7 @@ import localFont from "next/font/local";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
-import { decode, JwtPayload } from "jsonwebtoken";
+import {JwtPayload } from "jsonwebtoken";
 import ThemeSwitch from "./themeswitch";
 import { useUser } from "@/context/useUser-context";
 

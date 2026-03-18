@@ -8,15 +8,14 @@ export default function RacerNotFound() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-100 via-white to-white dark:from-purple-950 dark:via-gray-950 dark:to-gray-950 flex items-center justify-center px-6">
       <div className="max-w-4xl w-full flex flex-col md:flex-row items-center justify-center gap-10 text-center md:text-left animate-fadeIn">
-        
         {/* 🖼️ Illustration */}
         <div className="flex-shrink-0">
           <Image
-            src="/404-robot.svg" // replace with your vector
+            src="/404-racer-not-found.svg" // replace with your vector
             alt="Racer not found"
-            width={345}
-            height={345}
-            className="w-64 h-64 md:w-80 md:h-80 drop-shadow-md"
+            width={450}
+            height={450}
+            className="drop-shadow-md"
           />
         </div>
 
@@ -27,8 +26,8 @@ export default function RacerNotFound() {
           </h1>
 
           <p className="text-gray-600 dark:text-gray-400 max-w-md">
-            Looks like this racer hasn’t entered the track yet.  
-            Double-check the username or head back to the hub.
+            Looks like this racer hasn’t entered the track yet. Double-check the
+            username or head back to the hub.
           </p>
 
           <Link

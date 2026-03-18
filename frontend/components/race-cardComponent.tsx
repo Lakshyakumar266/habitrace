@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { motion } from "motion/react";
 import { HeartIcon, Globe, CirclePlus, Share2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -43,7 +44,6 @@ const RaceCardHub: React.FC<RaceCardHubProps> = ({
   createdBy,
 }) => {
   const [liked, setLiked] = useState<boolean>(false);
-  // const username =
 
   const shareData = {
     title: `🏁 ${title} | HabitRace`,
@@ -52,77 +52,101 @@ const RaceCardHub: React.FC<RaceCardHubProps> = ({
     }/race/${link}`,
   };
 
-  return (
-    <Card className={`${className}`}>
-      <CardHeader className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="flex flex-col gap-0.5">
-            <CardTitle className="flex items-center gap-1 text-lg text-gray-950 text-shadow-amber-300 dark:text-[#FAB12F] dark:text-shadow-yellow-600 wrap-anywhere">
-              {String(title).toUpperCase()}{" "}
-              {/* <BadgeCheckIcon className="size-4 fill-sky-600 stroke-white dark:fill-sky-400" /> */}
-            </CardTitle>
-            <span className="text-sm text-muted-foreground/70">
-              {convertDate(sDate)} - {convertDate(eDate)}
-            </span>{" "}
-            <CardDescription className="text-md dark:text-[#BDE3C3]">
-              @{createdBy?.replaceAll(" ", "_")}
-            </CardDescription>
-          </div>
-        </div>
-        <Link href={`/race/${link}`}>
-          <Button variant="outline" size="sm" className="cursor-pointer">
-            <CirclePlus className="size-4" />
-            Race
-          </Button>
-        </Link>
-      </CardHeader>
-      <CardContent className="space-y-6 text-md wrap-anywhere dark:text-gray-200">
-        <p>
-          {description ? (
-            description.slice(0,250) + "..."
-          ) : (
-            <>
-              its an race.{" "}
-              <a href="#" className="text-sky-600 dark:text-sky-400">
-                #race
-              </a>{" "}
-              <a href="#" className="text-sky-600 dark:text-sky-400">
-                #{link}
-              </a>{" "}
-              <a href="#" className="text-sky-600 dark:text-sky-400">
-                #{frequency}
-              </a>{" "}
-              <a href="#" className="text-sky-600 dark:text-sky-400">
-                #{title}
-              </a>
-            </>
-          )}
-        </p>
-      </CardContent>
-      <CardFooter className="flex justify-end items-center gap-1">
-        <Button variant="ghost" size="sm" onClick={() => setLiked(!liked)}>
-          <HeartIcon
-            className={cn(
-              "size-4",
-            liked && "fill-destructive stroke-destructive"
-            )}
-          />
-        </Button>
+  const DESCRIPTION_CLAMP_LENGTH = 250;
+  const isLongDescription =
+    !!description && description.length > DESCRIPTION_CLAMP_LENGTH;
 
-        <Button variant="ghost" size="sm">
-          <Globe className="size-4" />
-          1.1K
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="cursor-pointer"
-          onClick={() => handleShare(shareData)}
-        >
-          <Share2 className="size-4" />
-        </Button>
-      </CardFooter>
-    </Card>
+  return (
+    <motion.div
+      initial={{ scale: 1, boxShadow: "0 0 0 rgba(0,0,0,0)" }}
+      whileHover={{ scale: 1.02, boxShadow: "0 16px 40px rgba(0, 0, 0, 0.12)" }}
+      transition={{
+        type: "spring",
+        stiffness: 240,
+        damping: 22,
+        duration: 0.3,
+      }}
+      className={`${className} h-full border-gray-200 dark:border-gray-700`}
+    >
+      <Card className="h-full flex flex-col">
+        <CardHeader className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-0.5">
+              <CardTitle className="flex items-center gap-1 text-lg text-gray-950 text-shadow-amber-300 dark:text-[#FAB12F] dark:text-shadow-yellow-600 wrap-anywhere">
+                {String(title).toUpperCase()}{" "}
+                {/* <BadgeCheckIcon className="size-4 fill-sky-600 stroke-white dark:fill-sky-400" /> */}
+              </CardTitle>
+              <span className="text-sm text-muted-foreground/70">
+                {convertDate(sDate)} - {convertDate(eDate)}
+              </span>{" "}
+              <CardDescription className="text-md dark:text-[#BDE3C3]">
+                @{createdBy?.replaceAll(" ", "_")}
+              </CardDescription>
+            </div>
+          </div>
+          <Link href={`/race/${link}`}>
+            <Button variant="outline" size="sm" className="cursor-pointer">
+              <CirclePlus className="size-4" />
+              Race
+            </Button>
+          </Link>
+        </CardHeader>
+        <CardContent className="flex-1 min-h-[6rem] space-y-6 text-md wrap-anywhere dark:text-gray-200">
+          {description ? (
+            <p className="line-clamp-3">
+              {description}
+              {isLongDescription ? (
+                <Link
+                  href={`/race/${link}`}
+                  className="ml-1 inline text-xs font-semibold text-sky-600 dark:text-sky-400"
+                >
+                  Read more
+                </Link>
+              ) : null}
+            </p>
+          ) : (
+            <p>
+              its an race.{" "}
+              <Link href="#" className="text-sky-600 dark:text-sky-400">
+                #race
+              </Link>{" "}
+              <Link href="#" className="text-sky-600 dark:text-sky-400">
+                #{link}
+              </Link>{" "}
+              <Link href="#" className="text-sky-600 dark:text-sky-400">
+                #{frequency}
+              </Link>{" "}
+              <Link href="#" className="text-sky-600 dark:text-sky-400">
+                #{title}
+              </Link>
+            </p>
+          )}
+        </CardContent>
+        <CardFooter className="flex justify-end items-center gap-1">
+          <Button variant="ghost" size="sm" onClick={() => setLiked(!liked)}>
+            <HeartIcon
+              className={cn(
+                "size-4",
+                liked && "fill-destructive stroke-destructive",
+              )}
+            />
+          </Button>
+
+          <Button variant="ghost" size="sm">
+            <Globe className="size-4" />
+            1.1K
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="cursor-pointer"
+            onClick={() => handleShare(shareData)}
+          >
+            <Share2 className="size-4" />
+          </Button>
+        </CardFooter>
+      </Card>
+    </motion.div>
   );
 };
 

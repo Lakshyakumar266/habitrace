@@ -4,6 +4,7 @@ import RaceCardHub from "@/components/race-cardComponent";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { BACKEND_URL } from "../../../config";
+import Link from "next/dist/client/link";
 
 type Card = {
   id: number;
@@ -22,7 +23,6 @@ export default function Page() {
   const [cards, setCards] = useState<Card[]>([]);
   useEffect(() => {
     axios.get(`${BACKEND_URL}api/v1/race/`).then((response) => {
-
       setCards(response.data.data);
     });
   }, []);
@@ -50,7 +50,7 @@ export default function Page() {
                 link={card.raceSlug}
                 frequency={card.frequency}
                 createdBy={card.createdBy.username}
-              />
+                />
             ))}
           </div>
         )}
